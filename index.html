@@ -1,231 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Valentine?</title>
-  <style>
-    :root{
-      --bg1:#f7c7d9;
-      --bg2:#d9b7f5;
-      --card:rgba(255,255,255,.55);
-      --shadow: 0 18px 50px rgba(0,0,0,.18);
-      --yes:#e23b4a;
-      --yes2:#ff5a6e;
-      --no:#e6e6ea;
-      --text:#1f1f23;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      min-height:100svh;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(1100px 700px at 20% 20%, rgba(255,255,255,.35), transparent 60%),
-        radial-gradient(900px 600px at 80% 30%, rgba(255,255,255,.22), transparent 60%),
-        linear-gradient(160deg, var(--bg1), var(--bg2));
-      display:grid;
-      place-items:center;
-      overflow:hidden;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Valentine?</title>
 
-    /* floating hearts */
-    .hearts{position:fixed; inset:0; pointer-events:none; overflow:hidden}
-    .heart{
-      position:absolute;
-      font-size:18px;
-      opacity:.35;
-      animation: floatUp linear infinite;
-    }
-    @keyframes floatUp{
-      from{ transform: translateY(110vh) translateX(0) scale(.9); opacity:0; }
-      10%{opacity:.35}
-      to{ transform: translateY(-20vh) translateX(50px) scale(1.15); opacity:0; }
-    }
+<style>
+:root{
+  --bg1:#f7c7d9;
+  --bg2:#d9b7f5;
+  --card:rgba(255,255,255,.55);
+  --shadow:0 18px 50px rgba(0,0,0,.18);
+  --yes:#e23b4a;
+  --yes2:#ff5a6e;
+  --no:#e6e6ea;
+}
+*{box-sizing:border-box}
 
-    .wrap{ width:min(760px, 92vw); padding:28px 18px; display:grid; place-items:center; }
-    .card{
-      width:min(560px, 100%);
-      background:var(--card);
-      backdrop-filter: blur(10px);
-      border:1px solid rgba(255,255,255,.35);
-      box-shadow:var(--shadow);
-      border-radius:22px;
-      padding:30px 22px;
-      text-align:center;
-      position:relative;
-    }
-    h1{ margin:0 0 14px 0; font-size:clamp(22px, 3.3vw, 34px); line-height:1.15; font-weight:800; }
-    .sub{ margin:0 0 18px 0; font-size:14px; opacity:.75; }
+body{
+  margin:0;
+  min-height:100svh;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:
+    radial-gradient(1100px 700px at 20% 20%, rgba(255,255,255,.35), transparent 60%),
+    radial-gradient(900px 600px at 80% 30%, rgba(255,255,255,.22), transparent 60%),
+    linear-gradient(160deg, var(--bg1), var(--bg2));
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+}
 
-    .btnRow{ margin-top:10px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
-    button{
-      border:0; cursor:pointer; font-weight:900; letter-spacing:.4px;
-      padding:12px 22px; border-radius:999px;
-      box-shadow: 0 10px 20px rgba(0,0,0,.12);
-      transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
-      user-select:none; touch-action:manipulation; min-width:110px;
-    }
-    button:active{ transform: translateY(1px) scale(.99); }
-    .yes{ color:#fff; background: linear-gradient(135deg, var(--yes), var(--yes2)); }
-    .no{ color:#333; background: linear-gradient(135deg, #f3f3f6, var(--no)); }
+/* floating hearts */
+.hearts{position:fixed; inset:0; pointer-events:none}
+.heart{
+  position:absolute;
+  font-size:18px;
+  opacity:.35;
+  animation: floatUp linear infinite;
+}
+@keyframes floatUp{
+  from{transform:translateY(110vh);opacity:0}
+  10%{opacity:.35}
+  to{transform:translateY(-20vh);opacity:0}
+}
 
-    .page{ display:none; }
-    .page.active{ display:block; }
+.card{
+  width:min(560px, 94vw);
+  background:var(--card);
+  backdrop-filter: blur(10px);
+  border-radius:22px;
+  padding:30px;
+  box-shadow:var(--shadow);
+  text-align:center;
+  position:relative;
+}
 
-    /* mute button */
-    .pill{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding:10px 14px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.45);
-      background: rgba(255,255,255,.35);
-      box-shadow: 0 10px 22px rgba(0,0,0,.10);
-      font-weight:900; cursor:pointer; user-select:none;
-    }
-    #muteBtn{ position:fixed; bottom:18px; right:18px; z-index:1000; min-width:auto; padding:10px 14px; }
+h1{font-size:clamp(22px,4vw,34px);margin-bottom:10px}
+.sub{opacity:.75}
 
-    /* modal popup */
-    .modalOverlay{
-      position:fixed; inset:0;
-      display:none; place-items:center;
-      background: rgba(0,0,0,.25);
-      backdrop-filter: blur(6px);
-      z-index:1200;
-      padding:18px;
-    }
-    .modalOverlay.show{ display:grid; }
-    .modal{
-      width:min(420px, 92vw);
-      background: rgba(255,255,255,.75);
-      border:1px solid rgba(255,255,255,.45);
-      border-radius:20px;
-      box-shadow: 0 18px 50px rgba(0,0,0,.18);
-      padding:22px 18px 18px;
-      text-align:center;
-      transform: translateY(6px) scale(.98);
-      animation: pop .25s ease forwards;
-    }
-    @keyframes pop{ to{ transform: translateY(0) scale(1); } }
-    .modalTitle{ font-size: clamp(26px, 4vw, 40px); font-weight:950; margin:0 0 6px 0; }
-    .modalSub{ margin:0 0 14px 0; opacity:.8; font-weight:700; }
+.btnRow{
+  margin-top:16px;
+  display:flex;
+  gap:14px;
+  justify-content:center;
+  position:relative;
+}
 
-    /* instruction */
-    .bigIcon{ font-size:54px; margin:10px 0 8px; }
-    .instruction{ font-size: clamp(18px, 2.3vw, 22px); font-weight:900; line-height:1.25; margin:10px 0 0; }
-  </style>
+button{
+  border:0;
+  cursor:pointer;
+  padding:12px 24px;
+  border-radius:999px;
+  font-weight:900;
+  box-shadow:0 10px 20px rgba(0,0,0,.12);
+  transition:.15s;
+}
+button:active{transform:scale(.97)}
+
+.yes{background:linear-gradient(135deg,var(--yes),var(--yes2));color:#fff}
+.no{
+  background:linear-gradient(135deg,#f3f3f6,var(--no));
+  position:relative;
+}
+
+.page{display:none}
+.page.active{display:block}
+
+/* modal */
+.modalOverlay{
+  position:fixed; inset:0;
+  display:none; place-items:center;
+  background:rgba(0,0,0,.25);
+  backdrop-filter:blur(6px);
+  z-index:1000;
+}
+.modalOverlay.show{display:grid}
+
+.modal{
+  background:rgba(255,255,255,.75);
+  border-radius:20px;
+  padding:24px;
+  text-align:center;
+  box-shadow:0 18px 50px rgba(0,0,0,.18);
+}
+
+.modalTitle{font-size:38px;font-weight:900}
+.modalSub{opacity:.8;margin-bottom:16px}
+
+/* instruction */
+.bigIcon{font-size:54px}
+.instruction{font-size:22px;font-weight:900}
+
+/* mute */
+#muteBtn{
+  position:fixed;
+  bottom:18px;
+  right:18px;
+  padding:10px 14px;
+  border-radius:999px;
+  border:1px solid #fff;
+  background:rgba(255,255,255,.4);
+  font-weight:900;
+  cursor:pointer;
+}
+</style>
 </head>
 
 <body>
-  <!-- 🎵 Background Music (will start after first tap/click) -->
-  <audio id="bgMusic" loop>
-    <source src="Elifas%20Sonaru%20-%20Sweetest%20Day%20for%20You.mp3" type="audio/mpeg">
-  </audio>
-  <button id="muteBtn" class="pill" aria-label="Mute/unmute">🔊</button>
 
-  <div class="hearts" id="hearts"></div>
+<!-- 🎵 Music -->
+<audio id="bgMusic" loop>
+  <source src="Elifas%20Sonaru%20-%20Sweetest%20Day%20for%20You.mp3" type="audio/mpeg">
+</audio>
+<button id="muteBtn">🔊</button>
 
-  <div class="wrap">
-    <div class="card">
+<div class="hearts" id="hearts"></div>
 
-      <!-- ASK -->
-      <div class="page active" id="askPage">
-        <h1><span id="nameSlot">Renee</span>,<br/>choose YES or NO 💘</h1>
-        <p class="sub">Either way… I’ll be happy 😊</p>
-        <div class="btnRow">
-          <button class="yes" id="yesBtn">YES</button>
-          <button class="no" id="noBtn">NO</button>
-        </div>
-      </div>
+<div class="card">
 
-      <!-- INSTRUCTION -->
-      <div class="page" id="instructionPage">
-        <div class="bigIcon">📬</div>
-        <h1>One more thing…</h1>
-        <p class="instruction">To check the mailbox in your apartment</p>
-        <p class="sub" style="margin-top:12px;">There’s something waiting for you 💌</p>
-      </div>
+  <!-- ASK -->
+  <div class="page active" id="askPage">
+    <h1>Renee,<br>will you be my Valentine? 💘</h1>
+    <p class="sub">Be honest 😌</p>
 
+    <div class="btnRow" id="btnRow">
+      <button class="yes" id="yesBtn">YES</button>
+      <button class="no" id="noBtn">NO</button>
     </div>
   </div>
 
-  <!-- POPUP -->
-  <div class="modalOverlay" id="modal">
-    <div class="modal">
-      <div class="modalTitle">🎉 Yay! 🎉</div>
-      <p class="modalSub">Perfect 💖</p>
-      <button class="yes" id="continueBtn" style="min-width:160px;">Continue</button>
-    </div>
+  <!-- INSTRUCTION -->
+  <div class="page" id="instructionPage">
+    <div class="bigIcon">📬</div>
+    <h1>One more thing…</h1>
+    <p class="instruction">To check the mailbox in your apartment</p>
+    <p class="sub">Something special is waiting 💌</p>
   </div>
+</div>
 
-  <script>
-    // name param
-    const params = new URLSearchParams(location.search);
-    const name = params.get("name");
-    if (name) document.getElementById("nameSlot").textContent = name;
+<!-- MODAL -->
+<div class="modalOverlay" id="modal">
+  <div class="modal">
+    <div class="modalTitle">🎉 Yay! 🎉</div>
+    <p class="modalSub">I knew it 💖</p>
+    <button class="yes" id="continueBtn">Continue</button>
+  </div>
+</div>
 
-    // hearts
-    const hearts = document.getElementById("hearts");
-    const emojis = ["💖","💘","💕","💗","💓","❤️"];
-    for (let i=0;i<26;i++){
-      const s = document.createElement("div");
-      s.className = "heart";
-      s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-      s.style.left = Math.random()*100 + "vw";
-      s.style.animationDuration = (8 + Math.random()*10) + "s";
-      s.style.animationDelay = (-Math.random()*12) + "s";
-      s.style.fontSize = (14 + Math.random()*22) + "px";
-      hearts.appendChild(s);
-    }
+<script>
+// hearts
+const hearts=document.getElementById("hearts");
+["💖","💘","💕","💓","❤️"].forEach(e=>{
+  for(let i=0;i<5;i++){
+    const h=document.createElement("div");
+    h.className="heart";
+    h.textContent=e;
+    h.style.left=Math.random()*100+"vw";
+    h.style.animationDuration=8+Math.random()*8+"s";
+    hearts.appendChild(h);
+  }
+});
 
-    // music (autoplay-safe)
-    const bgMusic = document.getElementById("bgMusic");
-    const muteBtn = document.getElementById("muteBtn");
+// music unlock
+const music=document.getElementById("bgMusic");
+const mute=document.getElementById("muteBtn");
+async function playMusic(){ try{ await music.play(); }catch(e){} }
+window.addEventListener("pointerdown", playMusic, {once:true});
+mute.onclick=async()=>{
+  music.muted=!music.muted;
+  mute.textContent=music.muted?"🔇":"🔊";
+  if(!music.muted) await playMusic();
+};
 
-    async function tryPlayMusic(){
-      try { await bgMusic.play(); } catch(e) {}
-    }
+// NO button dodge
+const noBtn=document.getElementById("noBtn");
+const btnRow=document.getElementById("btnRow");
+let tries=0;
 
-    // Start on first user gesture anywhere
-    window.addEventListener("pointerdown", tryPlayMusic, { once:true });
+function dodge(){
+  tries++;
+  const rect=btnRow.getBoundingClientRect();
+  const x=(Math.random()*2-1)*Math.min(160, rect.width*0.4);
+  const y=(Math.random()*2-1)*80;
+  noBtn.style.transform=`translate(${x}px,${y}px)`;
+  if(tries>3){
+    document.getElementById("yesBtn").style.transform=`scale(${1+tries*0.05})`;
+  }
+}
+noBtn.addEventListener("mouseenter", dodge);
+noBtn.addEventListener("click", dodge);
+noBtn.addEventListener("touchstart",(e)=>{e.preventDefault();dodge();},{passive:false});
 
-    muteBtn.addEventListener("click", async () => {
-      bgMusic.muted = !bgMusic.muted;
-      muteBtn.textContent = bgMusic.muted ? "🔇" : "🔊";
-      if (!bgMusic.muted) await tryPlayMusic();
-    });
+// flow
+const modal=document.getElementById("modal");
+const askPage=document.getElementById("askPage");
+const instructionPage=document.getElementById("instructionPage");
 
-    // flow: yes/no -> modal -> continue -> instruction
-    const modal = document.getElementById("modal");
-    const askPage = document.getElementById("askPage");
-    const instructionPage = document.getElementById("instructionPage");
+document.getElementById("yesBtn").onclick=async()=>{
+  await playMusic();
+  modal.classList.add("show");
+};
+document.getElementById("continueBtn").onclick=()=>{
+  modal.classList.remove("show");
+  askPage.classList.remove("active");
+  instructionPage.classList.add("active");
+};
+</script>
 
-    function showModal(){ modal.classList.add("show"); }
-    function hideModal(){ modal.classList.remove("show"); }
-
-    function goInstruction(){
-      hideModal();
-      askPage.classList.remove("active");
-      instructionPage.classList.add("active");
-    }
-
-    document.getElementById("yesBtn").addEventListener("click", async () => {
-      await tryPlayMusic();
-      showModal();
-    });
-
-    document.getElementById("noBtn").addEventListener("click", async () => {
-      await tryPlayMusic();
-      showModal();
-    });
-
-    document.getElementById("continueBtn").addEventListener("click", async () => {
-      await tryPlayMusic();
-      goInstruction();
-    });
-
-    // optional: tap outside closes modal
-    modal.addEventListener("click", (e) => { if (e.target === modal) hideModal(); });
-  </script>
 </body>
 </html>
