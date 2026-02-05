@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Valentine?</title>
-
   <style>
     :root{
       --bg1:#f7c7d9;
@@ -15,19 +14,13 @@
       --yes2:#ff5a6e;
       --no:#e6e6ea;
       --text:#1f1f23;
-      --env:#f3e3c5;
-      --env2:#e8d1a8;
-      --wax:#cf2a3d;
-      --ink:#1d1c22;
-      --gold:#f2d27a;
     }
-
     *{box-sizing:border-box}
-
     body{
       margin:0;
       min-height:100svh;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
       background:
         radial-gradient(1100px 700px at 20% 20%, rgba(255,255,255,.35), transparent 60%),
         radial-gradient(900px 600px at 80% 30%, rgba(255,255,255,.22), transparent 60%),
@@ -38,7 +31,7 @@
     }
 
     /* floating hearts */
-    .hearts{position:fixed; inset:0; pointer-events:none}
+    .hearts{position:fixed; inset:0; pointer-events:none; overflow:hidden}
     .heart{
       position:absolute;
       font-size:18px;
@@ -46,214 +39,193 @@
       animation: floatUp linear infinite;
     }
     @keyframes floatUp{
-      from{ transform: translateY(110vh); opacity:0 }
+      from{ transform: translateY(110vh) translateX(0) scale(.9); opacity:0; }
       10%{opacity:.35}
-      to{ transform: translateY(-20vh); opacity:0 }
+      to{ transform: translateY(-20vh) translateX(50px) scale(1.15); opacity:0; }
     }
 
+    .wrap{ width:min(760px, 92vw); padding:28px 18px; display:grid; place-items:center; }
     .card{
-      width:min(560px, 94vw);
+      width:min(560px, 100%);
       background:var(--card);
       backdrop-filter: blur(10px);
-      border-radius:22px;
-      padding:30px;
+      border:1px solid rgba(255,255,255,.35);
       box-shadow:var(--shadow);
+      border-radius:22px;
+      padding:30px 22px;
       text-align:center;
-    }
-
-    h1{font-size:clamp(22px,4vw,34px)}
-    .sub{opacity:.75}
-
-    button{
-      border:0;
-      cursor:pointer;
-      padding:12px 24px;
-      border-radius:999px;
-      font-weight:800;
-      margin:6px;
-    }
-
-    .yes{background:linear-gradient(135deg,var(--yes),var(--yes2));color:#fff}
-    .no{background:#eee}
-
-    .page{display:none}
-    .page.active{display:block}
-
-    /* envelope */
-    .envelope{
-      width:320px;height:210px;
-      margin:auto;
       position:relative;
-      cursor:pointer;
-      filter: drop-shadow(0 18px 30px rgba(0,0,0,.2));
     }
+    h1{ margin:0 0 14px 0; font-size:clamp(22px, 3.3vw, 34px); line-height:1.15; font-weight:800; }
+    .sub{ margin:0 0 18px 0; font-size:14px; opacity:.75; }
 
-    .envBody{
-      position:absolute; inset:0;
-      background:linear-gradient(135deg,var(--env),var(--env2));
-      border-radius:18px;
+    .btnRow{ margin-top:10px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+    button{
+      border:0; cursor:pointer; font-weight:900; letter-spacing:.4px;
+      padding:12px 22px; border-radius:999px;
+      box-shadow: 0 10px 20px rgba(0,0,0,.12);
+      transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+      user-select:none; touch-action:manipulation; min-width:110px;
     }
+    button:active{ transform: translateY(1px) scale(.99); }
+    .yes{ color:#fff; background: linear-gradient(135deg, var(--yes), var(--yes2)); }
+    .no{ color:#333; background: linear-gradient(135deg, #f3f3f6, var(--no)); }
 
-    .flap{
-      position:absolute;top:0;left:0;
-      width:0;height:0;
-      border-style:solid;
-      border-width:120px 160px 0 160px;
-      border-color:rgba(0,0,0,.15) transparent transparent transparent;
-      transform-origin:top;
-      transition:.6s;
-    }
+    .page{ display:none; }
+    .page.active{ display:block; }
 
-    .seal{
-      position:absolute;
-      top:100px;left:50%;
-      transform:translateX(-50%);
-      width:56px;height:56px;
-      background:linear-gradient(135deg,#b90f23,var(--wax));
-      border-radius:50%;
-      display:grid;
-      place-items:center;
-      color:#fff;
-      font-size:22px;
-      transition:.4s;
-    }
-
-    .letter{
-      position:absolute;
-      top:20px;left:50%;
-      transform:translateX(-50%) translateY(120px);
-      width:280px;
-      padding:16px;
-      background:#fff;
-      border-radius:14px;
-      opacity:0;
-      transition:.8s;
-      text-align:left;
-    }
-
-    .magic{
-      background:linear-gradient(90deg,#000,#000);
-      background-size:0% 100%;
-      -webkit-background-clip:text;
-      color:transparent;
-      animation: ink 2.5s forwards;
-    }
-
-    @keyframes ink{
-      to{background-size:100% 100%}
-    }
-
-    .open .flap{transform:rotateX(170deg)}
-    .open .seal{opacity:0}
-    .open .letter{
-      transform:translateX(-50%) translateY(0);
-      opacity:1;
-    }
-
+    /* mute button */
     .pill{
-      padding:10px 16px;
-      border-radius:999px;
-      border:1px solid #fff;
-      background:rgba(255,255,255,.4);
-      font-weight:800;
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:10px 14px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.45);
+      background: rgba(255,255,255,.35);
+      box-shadow: 0 10px 22px rgba(0,0,0,.10);
+      font-weight:900; cursor:pointer; user-select:none;
     }
+    #muteBtn{ position:fixed; bottom:18px; right:18px; z-index:1000; min-width:auto; padding:10px 14px; }
 
-    #muteBtn{
-      position:fixed;
-      bottom:20px;right:20px;
-      z-index:999;
+    /* modal popup */
+    .modalOverlay{
+      position:fixed; inset:0;
+      display:none; place-items:center;
+      background: rgba(0,0,0,.25);
+      backdrop-filter: blur(6px);
+      z-index:1200;
+      padding:18px;
     }
+    .modalOverlay.show{ display:grid; }
+    .modal{
+      width:min(420px, 92vw);
+      background: rgba(255,255,255,.75);
+      border:1px solid rgba(255,255,255,.45);
+      border-radius:20px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.18);
+      padding:22px 18px 18px;
+      text-align:center;
+      transform: translateY(6px) scale(.98);
+      animation: pop .25s ease forwards;
+    }
+    @keyframes pop{ to{ transform: translateY(0) scale(1); } }
+    .modalTitle{ font-size: clamp(26px, 4vw, 40px); font-weight:950; margin:0 0 6px 0; }
+    .modalSub{ margin:0 0 14px 0; opacity:.8; font-weight:700; }
+
+    /* instruction */
+    .bigIcon{ font-size:54px; margin:10px 0 8px; }
+    .instruction{ font-size: clamp(18px, 2.3vw, 22px); font-weight:900; line-height:1.25; margin:10px 0 0; }
   </style>
 </head>
 
 <body>
+  <!-- 🎵 Background Music (will start after first tap/click) -->
+  <audio id="bgMusic" loop>
+    <source src="Elifas%20Sonaru%20-%20Sweetest%20Day%20for%20You.mp3" type="audio/mpeg">
+  </audio>
+  <button id="muteBtn" class="pill" aria-label="Mute/unmute">🔊</button>
 
-<!-- 🎵 Background Music -->
-<audio id="bgMusic" autoplay loop>
-  <source src="Elifas%20Sonaru%20-%20Sweetest%20Day%20for%20You.mp3" type="audio/mpeg">
-</audio>
-<button id="muteBtn" class="pill">🔊</button>
+  <div class="hearts" id="hearts"></div>
 
-<div class="hearts" id="hearts"></div>
+  <div class="wrap">
+    <div class="card">
 
-<div class="card">
-
-  <!-- ASK -->
-  <div class="page active" id="ask">
-    <h1>Renee,<br>will you be my Valentine? 💘</h1>
-    <p class="sub">Choose wisely 😌</p>
-    <button class="yes" onclick="goEnv()">YES</button>
-    <button class="no">NO</button>
-  </div>
-
-  <!-- ENVELOPE -->
-  <div class="page" id="env">
-    <h2>💌 You got mail 💌</h2>
-    <p class="sub">Tap the envelope</p>
-
-    <div class="envelope" onclick="openEnv()" id="envBox">
-      <div class="letter">
-        <strong>To my Valentine ✨</strong>
-        <p class="magic">
-          My love, you just made me the happiest person ever.
-          I can’t wait to celebrate with you—today, tomorrow, and always. 💖
-        </p>
-        <p style="opacity:.7">— Your husband ❤️</p>
+      <!-- ASK -->
+      <div class="page active" id="askPage">
+        <h1><span id="nameSlot">Renee</span>,<br/>choose YES or NO 💘</h1>
+        <p class="sub">Either way… I’ll be happy 😊</p>
+        <div class="btnRow">
+          <button class="yes" id="yesBtn">YES</button>
+          <button class="no" id="noBtn">NO</button>
+        </div>
       </div>
-      <div class="envBody"></div>
-      <div class="flap"></div>
-      <div class="seal">♡</div>
+
+      <!-- INSTRUCTION -->
+      <div class="page" id="instructionPage">
+        <div class="bigIcon">📬</div>
+        <h1>One more thing…</h1>
+        <p class="instruction">To check the mailbox in your apartment</p>
+        <p class="sub" style="margin-top:12px;">There’s something waiting for you 💌</p>
+      </div>
+
     </div>
-
-    <br>
-    <button class="pill" onclick="goYay()">Continue 💖</button>
   </div>
 
-  <!-- FINAL -->
-  <div class="page" id="yay">
-    <h1>💖 YAY!!! 💖</h1>
-    <p class="sub">Best decision ever 🥰</p>
-    <p>I love you ❤️</p>
+  <!-- POPUP -->
+  <div class="modalOverlay" id="modal">
+    <div class="modal">
+      <div class="modalTitle">🎉 Yay! 🎉</div>
+      <p class="modalSub">Perfect 💖</p>
+      <button class="yes" id="continueBtn" style="min-width:160px;">Continue</button>
+    </div>
   </div>
 
-</div>
+  <script>
+    // name param
+    const params = new URLSearchParams(location.search);
+    const name = params.get("name");
+    if (name) document.getElementById("nameSlot").textContent = name;
 
-<script>
-  // hearts
-  const hearts=document.getElementById("hearts");
-  ["💖","💘","💕","💓","❤️"].forEach(e=>{
-    for(let i=0;i<5;i++){
-      const h=document.createElement("div");
-      h.className="heart";
-      h.textContent=e;
-      h.style.left=Math.random()*100+"vw";
-      h.style.animationDuration=8+Math.random()*8+"s";
-      hearts.appendChild(h);
+    // hearts
+    const hearts = document.getElementById("hearts");
+    const emojis = ["💖","💘","💕","💗","💓","❤️"];
+    for (let i=0;i<26;i++){
+      const s = document.createElement("div");
+      s.className = "heart";
+      s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      s.style.left = Math.random()*100 + "vw";
+      s.style.animationDuration = (8 + Math.random()*10) + "s";
+      s.style.animationDelay = (-Math.random()*12) + "s";
+      s.style.fontSize = (14 + Math.random()*22) + "px";
+      hearts.appendChild(s);
     }
-  });
 
-  function goEnv(){
-    ask.classList.remove("active");
-    env.classList.add("active");
-  }
+    // music (autoplay-safe)
+    const bgMusic = document.getElementById("bgMusic");
+    const muteBtn = document.getElementById("muteBtn");
 
-  function openEnv(){
-    envBox.classList.add("open");
-  }
+    async function tryPlayMusic(){
+      try { await bgMusic.play(); } catch(e) {}
+    }
 
-  function goYay(){
-    env.classList.remove("active");
-    yay.classList.add("active");
-  }
+    // Start on first user gesture anywhere
+    window.addEventListener("pointerdown", tryPlayMusic, { once:true });
 
-  // music control
-  const music=document.getElementById("bgMusic");
-  const mute=document.getElementById("muteBtn");
-  mute.onclick=()=>{
-    music.muted=!music.muted;
-    mute.textContent=music.muted?"🔇":"🔊";
-  };
-</script>
+    muteBtn.addEventListener("click", async () => {
+      bgMusic.muted = !bgMusic.muted;
+      muteBtn.textContent = bgMusic.muted ? "🔇" : "🔊";
+      if (!bgMusic.muted) await tryPlayMusic();
+    });
 
+    // flow: yes/no -> modal -> continue -> instruction
+    const modal = document.getElementById("modal");
+    const askPage = document.getElementById("askPage");
+    const instructionPage = document.getElementById("instructionPage");
+
+    function showModal(){ modal.classList.add("show"); }
+    function hideModal(){ modal.classList.remove("show"); }
+
+    function goInstruction(){
+      hideModal();
+      askPage.classList.remove("active");
+      instructionPage.classList.add("active");
+    }
+
+    document.getElementById("yesBtn").addEventListener("click", async () => {
+      await tryPlayMusic();
+      showModal();
+    });
+
+    document.getElementById("noBtn").addEventListener("click", async () => {
+      await tryPlayMusic();
+      showModal();
+    });
+
+    document.getElementById("continueBtn").addEventListener("click", async () => {
+      await tryPlayMusic();
+      goInstruction();
+    });
+
+    // optional: tap outside closes modal
+    modal.addEventListener("click", (e) => { if (e.target === modal) hideModal(); });
+  </script>
 </body>
 </html>
