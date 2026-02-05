@@ -14,7 +14,6 @@
       --yes2:#ff5a6e;
       --no:#e6e6ea;
       --text:#1f1f23;
-
       --env:#f3e3c5;
       --env2:#e8d1a8;
       --wax:#cf2a3d;
@@ -124,7 +123,7 @@
     .page{ display:none; }
     .page.active{ display:block; }
 
-    /* ============ NEW: Envelope page ============ */
+    /* ============ NEW: Envelope page styles etc ============ */
     .envelopeStage{
       display:grid;
       place-items:center;
@@ -157,7 +156,6 @@
       border:1px solid rgba(255,255,255,.45);
       overflow:hidden;
     }
-    /* bottom triangles */
     .envBody:before, .envBody:after{
       content:"";
       position:absolute;
@@ -178,7 +176,6 @@
       transform: translateY(10px);
     }
 
-    /* flap */
     .flap{
       position:absolute;
       left:0; top:0;
@@ -203,7 +200,6 @@
       transition: transform .55s cubic-bezier(.2,.8,.2,1);
     }
 
-    /* wax seal */
     .seal{
       position:absolute;
       left:50%;
@@ -225,7 +221,6 @@
       transition: transform .35s ease, opacity .25s ease;
     }
 
-    /* letter that slides out */
     .letter{
       position:absolute;
       left:50%;
@@ -267,8 +262,6 @@
       line-height:1.4;
       font-size:14px;
       opacity:.98;
-
-      /* “ink writing” reveal */
       background: linear-gradient(90deg, rgba(29,28,34,1), rgba(29,28,34,1));
       -webkit-background-clip:text;
       background-clip:text;
@@ -291,7 +284,6 @@
       opacity:1;
     }
 
-    /* Harry-potter-ish glow + reveal animation when letter opens */
     .reveal .magicLine{
       animation: inkReveal 2.2s ease forwards, glowPulse 1.8s ease-in-out 0.2s infinite;
     }
@@ -304,7 +296,6 @@
       50%{ filter: drop-shadow(0 0 14px rgba(242,210,122,.55)); }
     }
 
-    /* sparkles */
     .sparkleLayer{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
     .spark{
       position:absolute;
@@ -321,7 +312,6 @@
       100%{ transform: translateY(-60px) translateX(20px) scale(1.15); opacity:0; }
     }
 
-    /* existing success page bits (kept, but now we go ask -> envelope -> yay) */
     .yay{
       font-size: clamp(28px, 4vw, 42px);
       margin-bottom:10px;
@@ -380,20 +370,16 @@
 </head>
 <body>
   <div class="hearts" id="hearts"></div>
-
   <div class="wrap">
     <div class="card">
-
       <!-- ASK PAGE -->
       <div class="page active" id="askPage">
         <h1><span id="nameSlot">Renee</span>,<br/>will you be my Valentine? 💘</h1>
         <p class="sub">Choose wisely 😌</p>
-
         <div class="btnRow" id="btnRow">
           <button class="yes" id="yesBtn">YES</button>
           <button class="no" id="noBtn">NO</button>
         </div>
-
         <div class="tiny">
           Tip: DO NOT TRY CLICK "No" BUTTON
         </div>
@@ -403,36 +389,26 @@
       <div class="page" id="envPage">
         <div class="yay" style="margin-bottom:4px;">💌 You got mail 💌</div>
         <p class="sub">Tap the envelope to open it</p>
-
         <div class="envelopeStage">
           <div class="envelope" id="envelope" aria-label="Open envelope" role="button">
             <div class="sparkleLayer" id="sparkleLayer"></div>
-
             <div class="letter" id="letter">
               <p class="letterTitle" id="letterTitle">To my Valentine ✨</p>
-
               <!-- The “magic writing” text -->
               <p class="magicLine" id="magicText">
                 My love, you just made me the happiest person ever. I can’t wait to celebrate with you—today, tomorrow, and always. 💖
               </p>
-
               <div class="tiny" style="position:relative; margin-top:10px; opacity:.7;">
                 — Your husband ❤️
               </div>
             </div>
-
             <div class="envBody"></div>
             <div class="flap"></div>
             <div class="flapTop"></div>
             <div class="seal">♡</div>
           </div>
-
           <div class="pill" id="continueBtn" style="display:none;">
             Continue 💖
-          </div>
-
-          <div class="tiny">
-            (If you tap again, the letter sparkles more ✨)
           </div>
         </div>
       </div>
@@ -441,19 +417,15 @@
       <div class="page" id="yayPage">
         <div class="yay">💖 YAY!!! 💖</div>
         <div class="sub">Best decision ever 🥰</div>
-
         <div class="media" id="mediaBox">
           <!-- Option A: show a video if you add one -->
           <!-- <video src="your-video.mp4" autoplay muted loop playsinline></video> -->
-
           <!-- Default placeholder -->
           <div style="padding:14px; font-weight:700; opacity:.75;">
             (Put your photo/video here)
           </div>
         </div>
-
         <div class="love">I love you ❤️</div>
-
         <div class="tiny">
           Want it to loop back? <a class="linkish" href="#" id="againLink">Ask again</a>
         </div>
@@ -503,20 +475,22 @@
       yayPage.classList.remove("active");
       envPage.classList.remove("active");
       askPage.classList.add("active");
-      // reset NO position + YES scaling
       noBtn.style.transform = "translate(0,0)";
       yesBtn.style.transform = "scale(1)";
       tries = 0;
-
-      // reset envelope state
       envelope.classList.remove("open","reveal");
       continueBtn.style.display = "none";
       magicText.style.animation = "none";
-      void magicText.offsetWidth; // reflow
+      void magicText.offsetWidth;
     }
 
     yesBtn.addEventListener("click", showEnv);
-    document.getElementById("againLink").addEventListener("click", (e)=>{ e.preventDefault(); showAsk(); });
+    document.addEventListener("DOMContentLoaded", () => {
+      const againLink = document.getElementById("againLink");
+      if (againLink) {
+        againLink.addEventListener("click", (e)=>{ e.preventDefault(); showAsk(); });
+      }
+    });
 
     // --- "NO" button dodges ---
     let tries = 0;
@@ -524,15 +498,11 @@
       tries++;
       const row = document.getElementById("btnRow");
       const rect = row.getBoundingClientRect();
-
       const maxX = Math.min(160, rect.width * 0.35);
       const maxY = 90;
-
       const x = (Math.random()*2 - 1) * maxX;
       const y = (Math.random()*2 - 1) * maxY;
-
       noBtn.style.transform = `translate(${x}px, ${y}px)`;
-
       if (tries >= 3){
         const scale = Math.min(1.28, 1 + tries*0.06);
         yesBtn.style.transform = `scale(${scale})`;
@@ -570,19 +540,13 @@
       if (!opened){
         opened = true;
         envelope.classList.add("open");
-
-        // start magic text reveal
         envelope.classList.add("reveal");
         magicText.style.animation = "none";
-        void magicText.offsetWidth; // reflow
-        magicText.style.animation = ""; // allow CSS anim
-
+        void magicText.offsetWidth;
+        magicText.style.animation = "";
         spawnSparkles(14);
-
-        // show continue after the letter is mostly out
         setTimeout(()=>{ continueBtn.style.display = "inline-flex"; }, 700);
       } else {
-        // extra sparkles on repeat taps
         spawnSparkles(10);
       }
     }
@@ -592,8 +556,6 @@
 
     continueBtn.addEventListener("click", showYay);
 
-    // Optional: allow query param to change letter text too:
-    // ?letter=Hello%20my%20love...
     const letterParam = params.get("letter");
     if (letterParam) magicText.textContent = letterParam;
   </script>
