@@ -14,6 +14,12 @@
       --yes2:#ff5a6e;
       --no:#e6e6ea;
       --text:#1f1f23;
+
+      --env:#f3e3c5;
+      --env2:#e8d1a8;
+      --wax:#cf2a3d;
+      --ink:#1d1c22;
+      --gold:#f2d27a;
     }
     *{box-sizing:border-box}
     body{
@@ -53,7 +59,7 @@
     }
 
     .card{
-      width:min(520px, 100%);
+      width:min(560px, 100%);
       background:var(--card);
       backdrop-filter: blur(10px);
       border:1px solid rgba(255,255,255,.35);
@@ -90,7 +96,7 @@
     button{
       border:0;
       cursor:pointer;
-      font-weight:700;
+      font-weight:800;
       letter-spacing:.4px;
       padding:12px 22px;
       border-radius:999px;
@@ -118,7 +124,204 @@
     .page{ display:none; }
     .page.active{ display:block; }
 
-    /* success page bits */
+    /* ============ NEW: Envelope page ============ */
+    .envelopeStage{
+      display:grid;
+      place-items:center;
+      gap:12px;
+      padding:6px 0 2px;
+    }
+    .prompt{
+      margin:0;
+      font-size:14px;
+      opacity:.8;
+      font-weight:650;
+    }
+
+    .envelope{
+      width:min(320px, 82vw);
+      height:210px;
+      position:relative;
+      cursor:pointer;
+      transform: translateY(0);
+      transition: transform .15s ease, filter .2s ease;
+      filter: drop-shadow(0 18px 30px rgba(0,0,0,.18));
+      user-select:none;
+      touch-action:manipulation;
+    }
+    .envelope:hover{ transform: translateY(-2px); }
+    .envBody{
+      position:absolute; inset:0;
+      background: linear-gradient(135deg, var(--env), var(--env2));
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.45);
+      overflow:hidden;
+    }
+    /* bottom triangles */
+    .envBody:before, .envBody:after{
+      content:"";
+      position:absolute;
+      width:0; height:0;
+      border-style:solid;
+      opacity:.95;
+    }
+    .envBody:before{
+      left:0; bottom:0;
+      border-width:0 160px 120px 160px;
+      border-color: transparent transparent rgba(0,0,0,.08) transparent;
+      filter: blur(.2px);
+    }
+    .envBody:after{
+      left:0; bottom:0;
+      border-width:0 160px 120px 160px;
+      border-color: transparent transparent rgba(255,255,255,.22) transparent;
+      transform: translateY(10px);
+    }
+
+    /* flap */
+    .flap{
+      position:absolute;
+      left:0; top:0;
+      width:0; height:0;
+      border-style:solid;
+      border-width:120px 160px 0 160px;
+      border-color: rgba(0,0,0,.10) transparent transparent transparent;
+      transform-origin: 50% 0%;
+      transform: rotateX(0deg);
+      transition: transform .55s cubic-bezier(.2,.8,.2,1);
+      filter: blur(.1px);
+    }
+    .flapTop{
+      position:absolute;
+      left:0; top:0;
+      width:0; height:0;
+      border-style:solid;
+      border-width:116px 156px 0 156px;
+      border-color: rgba(255,255,255,.20) transparent transparent transparent;
+      transform-origin: 50% 0%;
+      transform: rotateX(0deg);
+      transition: transform .55s cubic-bezier(.2,.8,.2,1);
+    }
+
+    /* wax seal */
+    .seal{
+      position:absolute;
+      left:50%;
+      top:108px;
+      transform: translateX(-50%);
+      width:56px;
+      height:56px;
+      background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.32), transparent 40%),
+                  radial-gradient(circle at 60% 70%, rgba(0,0,0,.22), transparent 45%),
+                  linear-gradient(135deg, #b90f23, var(--wax));
+      border-radius:50%;
+      box-shadow: 0 10px 18px rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.25);
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      color: rgba(255,255,255,.86);
+      text-shadow: 0 2px 0 rgba(0,0,0,.12);
+      transition: transform .35s ease, opacity .25s ease;
+    }
+
+    /* letter that slides out */
+    .letter{
+      position:absolute;
+      left:50%;
+      top:18px;
+      transform: translateX(-50%) translateY(130px);
+      width:min(290px, 78vw);
+      height:170px;
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.08);
+      box-shadow: 0 16px 26px rgba(0,0,0,.14);
+      overflow:hidden;
+      opacity:0;
+      transition: transform .75s cubic-bezier(.2,.9,.2,1), opacity .3s ease;
+      padding:16px 16px 12px;
+      text-align:left;
+    }
+    .letter:before{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background: radial-gradient(circle at 35% 30%, rgba(242,210,122,.18), transparent 50%),
+                  radial-gradient(circle at 70% 60%, rgba(255,90,110,.10), transparent 55%);
+      transform: rotate(12deg);
+      pointer-events:none;
+    }
+
+    .letterTitle{
+      position:relative;
+      font-weight:900;
+      letter-spacing:.2px;
+      margin:0 0 8px;
+    }
+    .magicLine{
+      position:relative;
+      margin:0;
+      color: var(--ink);
+      font-weight:700;
+      line-height:1.4;
+      font-size:14px;
+      opacity:.98;
+
+      /* “ink writing” reveal */
+      background: linear-gradient(90deg, rgba(29,28,34,1), rgba(29,28,34,1));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color: transparent;
+      background-size: 0% 100%;
+      background-repeat:no-repeat;
+      filter: drop-shadow(0 0 10px rgba(242,210,122,.0));
+    }
+
+    .open .flap,
+    .open .flapTop{
+      transform: rotateX(165deg);
+    }
+    .open .seal{
+      transform: translateX(-50%) scale(.92);
+      opacity:.0;
+    }
+    .open .letter{
+      transform: translateX(-50%) translateY(0px);
+      opacity:1;
+    }
+
+    /* Harry-potter-ish glow + reveal animation when letter opens */
+    .reveal .magicLine{
+      animation: inkReveal 2.2s ease forwards, glowPulse 1.8s ease-in-out 0.2s infinite;
+    }
+    @keyframes inkReveal{
+      from{ background-size: 0% 100%; }
+      to{ background-size: 100% 100%; }
+    }
+    @keyframes glowPulse{
+      0%,100%{ filter: drop-shadow(0 0 0px rgba(242,210,122,.0)); }
+      50%{ filter: drop-shadow(0 0 14px rgba(242,210,122,.55)); }
+    }
+
+    /* sparkles */
+    .sparkleLayer{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+    .spark{
+      position:absolute;
+      width:6px; height:6px;
+      border-radius:50%;
+      background: radial-gradient(circle, rgba(255,255,255,.9), rgba(242,210,122,.6), transparent 70%);
+      filter: drop-shadow(0 0 10px rgba(242,210,122,.55));
+      opacity:0;
+      animation: sparkFloat 1.9s ease forwards;
+    }
+    @keyframes sparkFloat{
+      0%{ transform: translateY(10px) scale(.7); opacity:0; }
+      15%{ opacity:.95; }
+      100%{ transform: translateY(-60px) translateX(20px) scale(1.15); opacity:0; }
+    }
+
+    /* existing success page bits (kept, but now we go ask -> envelope -> yay) */
     .yay{
       font-size: clamp(28px, 4vw, 42px);
       margin-bottom:10px;
@@ -157,6 +360,22 @@
       text-decoration:underline;
       text-underline-offset:3px;
     }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:10px 16px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.45);
+      background: rgba(255,255,255,.35);
+      box-shadow: 0 10px 22px rgba(0,0,0,.10);
+      font-weight:800;
+      cursor:pointer;
+      user-select:none;
+      margin-top:14px;
+    }
   </style>
 </head>
 <body>
@@ -176,7 +395,45 @@
         </div>
 
         <div class="tiny">
-          Tip: DO NOT TRY CLICK "No" BUTTON 
+          Tip: DO NOT TRY CLICK "No" BUTTON
+        </div>
+      </div>
+
+      <!-- NEW: ENVELOPE PAGE -->
+      <div class="page" id="envPage">
+        <div class="yay" style="margin-bottom:4px;">💌 You got mail 💌</div>
+        <p class="sub">Tap the envelope to open it</p>
+
+        <div class="envelopeStage">
+          <div class="envelope" id="envelope" aria-label="Open envelope" role="button">
+            <div class="sparkleLayer" id="sparkleLayer"></div>
+
+            <div class="letter" id="letter">
+              <p class="letterTitle" id="letterTitle">To my Valentine ✨</p>
+
+              <!-- The “magic writing” text -->
+              <p class="magicLine" id="magicText">
+                My love, you just made me the happiest person ever. I can’t wait to celebrate with you—today, tomorrow, and always. 💖
+              </p>
+
+              <div class="tiny" style="position:relative; margin-top:10px; opacity:.7;">
+                — Your husband ❤️
+              </div>
+            </div>
+
+            <div class="envBody"></div>
+            <div class="flap"></div>
+            <div class="flapTop"></div>
+            <div class="seal">♡</div>
+          </div>
+
+          <div class="pill" id="continueBtn" style="display:none;">
+            Continue 💖
+          </div>
+
+          <div class="tiny">
+            (If you tap again, the letter sparkles more ✨)
+          </div>
         </div>
       </div>
 
@@ -227,34 +484,47 @@
 
     // --- page switching ---
     const askPage = document.getElementById("askPage");
+    const envPage = document.getElementById("envPage");
     const yayPage = document.getElementById("yayPage");
+
     const yesBtn = document.getElementById("yesBtn");
     const noBtn  = document.getElementById("noBtn");
 
-    function showYay(){
+    function showEnv(){
       askPage.classList.remove("active");
+      yayPage.classList.remove("active");
+      envPage.classList.add("active");
+    }
+    function showYay(){
+      envPage.classList.remove("active");
       yayPage.classList.add("active");
     }
     function showAsk(){
       yayPage.classList.remove("active");
+      envPage.classList.remove("active");
       askPage.classList.add("active");
-      // reset NO position
+      // reset NO position + YES scaling
       noBtn.style.transform = "translate(0,0)";
+      yesBtn.style.transform = "scale(1)";
       tries = 0;
+
+      // reset envelope state
+      envelope.classList.remove("open","reveal");
+      continueBtn.style.display = "none";
+      magicText.style.animation = "none";
+      void magicText.offsetWidth; // reflow
     }
 
-    yesBtn.addEventListener("click", showYay);
+    yesBtn.addEventListener("click", showEnv);
     document.getElementById("againLink").addEventListener("click", (e)=>{ e.preventDefault(); showAsk(); });
 
-    // --- "NO" button dodges like these viral valentines sites ---
+    // --- "NO" button dodges ---
     let tries = 0;
-
     function dodge(){
       tries++;
       const row = document.getElementById("btnRow");
       const rect = row.getBoundingClientRect();
 
-      // move within a reasonable area around the button row
       const maxX = Math.min(160, rect.width * 0.35);
       const maxY = 90;
 
@@ -263,17 +533,69 @@
 
       noBtn.style.transform = `translate(${x}px, ${y}px)`;
 
-      // after a few tries, make YES bigger (fun + gentle pressure)
       if (tries >= 3){
-        const scale = Math.min(1.25, 1 + tries*0.05);
+        const scale = Math.min(1.28, 1 + tries*0.06);
         yesBtn.style.transform = `scale(${scale})`;
       }
     }
-
-    // dodge on hover / touch
     noBtn.addEventListener("mouseenter", dodge);
     noBtn.addEventListener("click", dodge);
     noBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); dodge(); }, {passive:false});
+
+    // ============ Envelope logic ============
+    const envelope = document.getElementById("envelope");
+    const continueBtn = document.getElementById("continueBtn");
+    const sparkleLayer = document.getElementById("sparkleLayer");
+    const magicText = document.getElementById("magicText");
+
+    let opened = false;
+
+    function spawnSparkles(count=10){
+      const rect = envelope.getBoundingClientRect();
+      for (let i=0;i<count;i++){
+        const sp = document.createElement("div");
+        sp.className = "spark";
+        const x = 20 + Math.random() * (rect.width - 40);
+        const y = 90 + Math.random() * 70;
+        sp.style.left = x + "px";
+        sp.style.top  = y + "px";
+        sp.style.animationDelay = (Math.random() * 0.25) + "s";
+        sp.style.transform = `translate(${(Math.random()*2-1)*18}px, ${(Math.random()*2-1)*10}px) scale(${0.7+Math.random()*0.7})`;
+        sparkleLayer.appendChild(sp);
+        sp.addEventListener("animationend", ()=> sp.remove());
+      }
+    }
+
+    function openEnvelope(){
+      if (!opened){
+        opened = true;
+        envelope.classList.add("open");
+
+        // start magic text reveal
+        envelope.classList.add("reveal");
+        magicText.style.animation = "none";
+        void magicText.offsetWidth; // reflow
+        magicText.style.animation = ""; // allow CSS anim
+
+        spawnSparkles(14);
+
+        // show continue after the letter is mostly out
+        setTimeout(()=>{ continueBtn.style.display = "inline-flex"; }, 700);
+      } else {
+        // extra sparkles on repeat taps
+        spawnSparkles(10);
+      }
+    }
+
+    envelope.addEventListener("click", openEnvelope);
+    envelope.addEventListener("touchstart", (e)=>{ e.preventDefault(); openEnvelope(); }, {passive:false});
+
+    continueBtn.addEventListener("click", showYay);
+
+    // Optional: allow query param to change letter text too:
+    // ?letter=Hello%20my%20love...
+    const letterParam = params.get("letter");
+    if (letterParam) magicText.textContent = letterParam;
   </script>
 </body>
 </html>
