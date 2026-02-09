@@ -1,231 +1,1166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Valentine?</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Valentine Perfume Quiz</title>
+  <style>
+    :root{
+      --bg1:#f7c7d9;
+      --bg2:#d9b7f5;
+      --card:rgba(255,255,255,.58);
+      --card-border:rgba(255,255,255,.38);
+      --shadow: 0 18px 50px rgba(0,0,0,.18);
+      --yes:#e23b4a;
+      --yes2:#ff5a6e;
+      --no:#e6e6ea;
+      --no2:#f3f3f6;
+      --text:#1f1f23;
+      --toggle-bg:rgba(255,255,255,.72);
+      --toggle-border:rgba(255,255,255,.6);
+      --toggle-text:#1f1f23;
+      --choice-bg:rgba(255,255,255,.7);
+      --muted:rgba(31,31,35,.7);
+    }
+    :root[data-theme="dark"]{
+      --bg1:#1b1730;
+      --bg2:#332042;
+      --card:rgba(25,25,35,.76);
+      --card-border:rgba(255,255,255,.15);
+      --shadow: 0 24px 60px rgba(0,0,0,.42);
+      --yes:#ff5a6e;
+      --yes2:#ff7f92;
+      --no:#434656;
+      --no2:#5d6277;
+      --text:#f2f3f8;
+      --toggle-bg:rgba(255,255,255,.12);
+      --toggle-border:rgba(255,255,255,.22);
+      --toggle-text:#f2f3f8;
+      --choice-bg:rgba(255,255,255,.07);
+      --muted:rgba(242,243,248,.74);
+    }
 
-<style>
-:root{
-  --bg1:#f7c7d9;
-  --bg2:#d9b7f5;
-  --card:rgba(255,255,255,.55);
-  --shadow:0 18px 50px rgba(0,0,0,.18);
-  --yes:#e23b4a;
-  --yes2:#ff5a6e;
-  --no:#e6e6ea;
-}
-*{box-sizing:border-box}
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100svh;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1100px 700px at 20% 20%, rgba(255,255,255,.35), transparent 60%),
+        radial-gradient(900px 600px at 80% 30%, rgba(255,255,255,.22), transparent 60%),
+        linear-gradient(160deg, var(--bg1), var(--bg2));
+      display:grid;
+      place-items:center;
+      overflow-x:hidden;
+      overflow-y:auto;
+    }
 
-body{
-  margin:0;
-  min-height:100svh;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background:
-    radial-gradient(1100px 700px at 20% 20%, rgba(255,255,255,.35), transparent 60%),
-    radial-gradient(900px 600px at 80% 30%, rgba(255,255,255,.22), transparent 60%),
-    linear-gradient(160deg, var(--bg1), var(--bg2));
-  display:grid;
-  place-items:center;
-  overflow:hidden;
-}
+    .hearts{position:fixed; inset:0; pointer-events:none; overflow:hidden}
+    .heart{
+      position:absolute;
+      font-size:18px;
+      opacity:.35;
+      animation: floatUp linear infinite;
+      filter: blur(.1px);
+    }
+    @keyframes floatUp{
+      from{ transform: translateY(110vh) translateX(0) scale(.9); opacity:.0; }
+      10%{opacity:.35}
+      to{ transform: translateY(-20vh) translateX(50px) scale(1.15); opacity:0; }
+    }
 
-/* floating hearts */
-.hearts{position:fixed; inset:0; pointer-events:none}
-.heart{
-  position:absolute;
-  font-size:18px;
-  opacity:.35;
-  animation: floatUp linear infinite;
-}
-@keyframes floatUp{
-  from{transform:translateY(110vh);opacity:0}
-  10%{opacity:.35}
-  to{transform:translateY(-20vh);opacity:0}
-}
+    .wrap{
+      width:min(860px, 92vw);
+      padding:28px 18px 92px;
+      display:grid;
+      place-items:center;
+    }
 
-.card{
-  width:min(560px, 94vw);
-  background:var(--card);
-  backdrop-filter: blur(10px);
-  border-radius:22px;
-  padding:30px;
-  box-shadow:var(--shadow);
-  text-align:center;
-  position:relative;
-}
+    .card{
+      width:min(760px, 100%);
+      background:var(--card);
+      backdrop-filter: blur(10px);
+      border:1px solid var(--card-border);
+      box-shadow:var(--shadow);
+      border-radius:22px;
+      padding:30px 22px;
+      text-align:center;
+      position:relative;
+    }
 
-h1{font-size:clamp(22px,4vw,34px);margin-bottom:10px}
-.sub{opacity:.75}
+    .themeToggle,
+    .musicToggle{
+      border:1px solid var(--toggle-border);
+      background:var(--toggle-bg);
+      color:var(--toggle-text);
+      box-shadow:none;
+      min-width:auto;
+      padding:8px 12px;
+      font-size:12px;
+      line-height:1;
+      letter-spacing:.2px;
+    }
 
-.btnRow{
-  margin-top:16px;
-  display:flex;
-  gap:14px;
-  justify-content:center;
-  position:relative;
-}
+    .themeToggle{
+      position:absolute;
+      right:102px;
+      bottom:-56px;
+    }
 
-button{
-  border:0;
-  cursor:pointer;
-  padding:12px 24px;
-  border-radius:999px;
-  font-weight:900;
-  box-shadow:0 10px 20px rgba(0,0,0,.12);
-  transition:.15s;
-}
-button:active{transform:scale(.97)}
+    .musicToggle{
+      position:absolute;
+      right:0;
+      bottom:-56px;
+      z-index:20;
+    }
 
-.yes{background:linear-gradient(135deg,var(--yes),var(--yes2));color:#fff}
-.no{
-  background:linear-gradient(135deg,#f3f3f6,var(--no));
-  position:relative;
-}
+    .themeToggle:hover,
+    .musicToggle:hover{ filter:brightness(1.05); }
 
-.page{display:none}
-.page.active{display:block}
+    h1{
+      margin:10px 0 12px;
+      font-size: clamp(22px, 3.3vw, 34px);
+      letter-spacing:.2px;
+      line-height:1.15;
+      font-weight:760;
+      text-shadow: 0 2px 0 rgba(255,255,255,.25);
+    }
 
-/* modal */
-.modalOverlay{
-  position:fixed; inset:0;
-  display:none; place-items:center;
-  background:rgba(0,0,0,.25);
-  backdrop-filter:blur(6px);
-  z-index:1000;
-}
-.modalOverlay.show{display:grid}
+    .sub{
+      margin:0 0 20px;
+      font-size:14px;
+      color:var(--muted);
+    }
 
-.modal{
-  background:rgba(255,255,255,.75);
-  border-radius:20px;
-  padding:24px;
-  text-align:center;
-  box-shadow:0 18px 50px rgba(0,0,0,.18);
-}
+    .btnRow{
+      margin-top:14px;
+      display:flex;
+      gap:14px;
+      justify-content:center;
+      flex-wrap:wrap;
+      position:relative;
+      padding-bottom:10px;
+    }
 
-.modalTitle{font-size:38px;font-weight:900}
-.modalSub{opacity:.8;margin-bottom:16px}
+    button{
+      border:0;
+      cursor:pointer;
+      font-weight:700;
+      letter-spacing:.35px;
+      padding:12px 22px;
+      border-radius:999px;
+      box-shadow: 0 10px 20px rgba(0,0,0,.12);
+      transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+      user-select:none;
+      touch-action:manipulation;
+      min-width:92px;
+    }
 
-/* instruction */
-.bigIcon{font-size:54px}
-.instruction{font-size:22px;font-weight:900}
+    button:active{ transform: translateY(1px) scale(.99); }
 
-/* mute */
-#muteBtn{
-  position:fixed;
-  bottom:18px;
-  right:18px;
-  padding:10px 14px;
-  border-radius:999px;
-  border:1px solid #fff;
-  background:rgba(255,255,255,.4);
-  font-weight:900;
-  cursor:pointer;
-}
-</style>
+    .yes{
+      color:#fff;
+      background: linear-gradient(135deg, var(--yes), var(--yes2));
+    }
+    .yes:hover{ filter: brightness(1.03); box-shadow: 0 14px 26px rgba(0,0,0,.16); }
+
+    .no{
+      color:var(--text);
+      background: linear-gradient(135deg, var(--no2), var(--no));
+      position:relative;
+    }
+    .no:hover{ box-shadow: 0 14px 26px rgba(0,0,0,.14); }
+
+    .page{ display:none; }
+    .page.active{ display:block; }
+
+    .tiny{
+      margin-top:10px;
+      font-size:12px;
+      opacity:.65;
+    }
+
+    .quizHeader{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin:4px 0 8px;
+      font-size:13px;
+      color:var(--muted);
+      font-weight:650;
+    }
+
+    .progressTrack{
+      width:100%;
+      height:8px;
+      border-radius:999px;
+      background:rgba(255,255,255,.25);
+      border:1px solid var(--card-border);
+      overflow:hidden;
+      margin-bottom:14px;
+    }
+
+    .progressFill{
+      width:0;
+      height:100%;
+      background:linear-gradient(90deg, var(--yes), var(--yes2));
+      transition:width .24s ease;
+    }
+
+    .questionTitle{
+      text-align:left;
+      margin:0 0 14px;
+      font-size:clamp(18px, 2.7vw, 25px);
+      line-height:1.3;
+      font-weight:730;
+    }
+
+    .optionsGrid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:12px;
+    }
+
+    .optionCard{
+      display:block;
+      width:100%;
+      border:1px solid var(--card-border);
+      background:var(--choice-bg);
+      border-radius:16px;
+      padding:10px;
+      text-align:left;
+      box-shadow:none;
+      min-width:0;
+    }
+
+    .optionCard:hover{
+      transform:translateY(-1px);
+      box-shadow: 0 12px 22px rgba(0,0,0,.12);
+    }
+
+    .optionVisual{
+      width:100%;
+      aspect-ratio: 16/10;
+      border-radius:12px;
+      overflow:hidden;
+      position:relative;
+      border:1px solid rgba(255,255,255,.25);
+      display:grid;
+      place-items:center;
+      margin-bottom:8px;
+    }
+
+    .optionVisual span{
+      font-size:34px;
+      filter: drop-shadow(0 3px 4px rgba(0,0,0,.22));
+    }
+
+    .sceneA{ background:linear-gradient(145deg, #85d6ff, #fbe7a0); }
+    .sceneB{ background:linear-gradient(145deg, #ffc5d3, #ffe9a8); }
+    .sceneC{ background:linear-gradient(145deg, #ecd9ff, #ffe6cb); }
+    .sceneD{ background:linear-gradient(145deg, #3f4d87, #101424); }
+
+    .optionText{
+      display:block;
+      font-size:13px;
+      line-height:1.35;
+      color:var(--text);
+      font-weight:650;
+      letter-spacing:.1px;
+    }
+
+    .resultTitle{
+      font-size:clamp(24px, 3.8vw, 39px);
+      margin:4px 0 8px;
+      line-height:1.12;
+    }
+
+    .resultLead{
+      margin:0 auto 16px;
+      color:var(--muted);
+      max-width:620px;
+    }
+
+    .perfumeGrid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:10px;
+      margin-top:14px;
+      text-align:left;
+    }
+
+    .perfumeCard{
+      border:1px solid var(--card-border);
+      border-radius:14px;
+      padding:10px 12px;
+      background:var(--choice-bg);
+    }
+
+    .perfumeName{
+      margin:0 0 4px;
+      font-weight:740;
+      font-size:14px;
+    }
+
+    .perfumeNote{
+      margin:0;
+      font-size:12px;
+      opacity:.84;
+      line-height:1.4;
+    }
+    .perfumeLinks{
+      margin-top:8px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .perfumeLink{
+      font-size:12px;
+      font-weight:700;
+      text-decoration:underline;
+      text-underline-offset:3px;
+      color:inherit;
+      opacity:.9;
+    }
+
+    .againBtn{
+      margin-top:18px;
+      color:#fff;
+      background: linear-gradient(135deg, var(--yes), var(--yes2));
+    }
+    .moreBtn{
+      margin-top:14px;
+      border:1px solid rgba(200,150,20,.45);
+      background: linear-gradient(135deg, #ffd54a, #ffbf2f);
+      color:#2a1d00;
+      box-shadow: 0 10px 20px rgba(180,130,10,.25);
+      font-weight:760;
+    }
+    .moreBtn:hover{
+      filter:brightness(1.03);
+    }
+    .morePanel{
+      margin-top:12px;
+      display:none;
+    }
+    .morePanel.active{ display:block; }
+    .catalogGrid{
+      display:grid;
+      gap:12px;
+    }
+    .catalogGroup{
+      border:1px solid var(--card-border);
+      border-radius:14px;
+      background:var(--choice-bg);
+      padding:10px;
+    }
+    .catalogGroupTitle{
+      margin:0 0 8px;
+      text-align:left;
+      font-size:14px;
+      font-weight:760;
+    }
+    .catalogTitle{
+      margin:0 0 8px;
+      text-align:left;
+      font-size:16px;
+      font-weight:740;
+    }
+    .catalogMeta{
+      margin:0 0 10px;
+      text-align:left;
+      font-size:12px;
+      opacity:.75;
+    }
+    .shopTitle{
+      margin:18px 0 10px;
+      text-align:left;
+      font-size:16px;
+      font-weight:740;
+    }
+    .shopGrid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:10px;
+      text-align:left;
+    }
+    .shopCard{
+      border:1px solid var(--card-border);
+      border-radius:14px;
+      padding:10px 12px;
+      background:var(--choice-bg);
+    }
+    .shopName{
+      margin:0 0 5px;
+      font-weight:740;
+      font-size:14px;
+    }
+    .shopMeta{
+      margin:0;
+      font-size:12px;
+      opacity:.86;
+      line-height:1.4;
+    }
+    .shopLinks{
+      margin-top:8px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .shareTitle{
+      margin:18px 0 10px;
+      text-align:left;
+      font-size:16px;
+      font-weight:740;
+    }
+    .shareRow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:flex-start;
+    }
+    .shareBtn{
+      border:1px solid var(--card-border);
+      background:var(--choice-bg);
+      color:var(--text);
+      text-decoration:none;
+      font-size:12px;
+      font-weight:740;
+      padding:10px 12px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      box-shadow:none;
+      min-width:0;
+    }
+    .shareBtn:hover{ filter:brightness(1.03); }
+    .mailboxToast{
+      position:fixed;
+      top:18px;
+      left:50%;
+      transform:translateX(-50%) translateY(-12px);
+      width:min(680px, 92vw);
+      text-align:center;
+      background:rgba(255,250,220,.98);
+      color:#281600;
+      border:2px solid rgba(255,201,71,.9);
+      border-radius:16px;
+      padding:14px 18px;
+      font-size:18px;
+      line-height:1.25;
+      font-weight:760;
+      box-shadow:0 14px 30px rgba(0,0,0,.25);
+      z-index:1200;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .2s ease, transform .2s ease;
+      backdrop-filter:blur(8px);
+    }
+    .mailboxToast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
+    }
+
+    @media (max-width:700px){
+      .optionsGrid,
+      .perfumeGrid,
+      .shopGrid{ grid-template-columns:1fr; }
+      .themeToggle{ right:110px; bottom:-52px; }
+      .musicToggle{ bottom:-52px; right:8px; }
+      .card{ padding:26px 16px; }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="mailboxToast" id="mailboxToast">📬 Go check your mailbox in the Lobby! 💌</div>
+  <div class="hearts" id="hearts"></div>
 
-<!-- 🎵 Music -->
-<audio id="bgMusic" loop>
-  <source src="Elifas%20Sonaru%20-%20Sweetest%20Day%20for%20You.mp3" type="audio/mpeg">
-</audio>
-<button id="muteBtn">🔊</button>
+  <div class="wrap">
+    <div class="card">
+      <button class="musicToggle" id="musicToggle" type="button" aria-label="Play background music">▶ Music</button>
+      <button class="themeToggle" id="themeToggle" type="button" aria-label="Toggle dark mode">🌙 Dark</button>
+      <audio id="bgMusic" autoplay loop preload="metadata">
+        <source src="song.mp3" type="audio/mpeg" />
+      </audio>
 
-<div class="hearts" id="hearts"></div>
+      <div class="page active" id="askPage">
+        <h1><span id="nameSlot">Renee</span>,<br/>will you be my Valentine? 💘</h1>
+        <p class="sub">Say yes, then I will find your perfect date-night perfume.</p>
 
-<div class="card">
+        <div class="btnRow" id="btnRow">
+          <button class="yes" id="yesBtn" type="button">YES</button>
+          <button class="no" id="noBtn" type="button">NO</button>
+        </div>
 
-  <!-- ASK -->
-  <div class="page active" id="askPage">
-    <h1>Renee,<br>will you be my Valentine? 💘</h1>
-    <p class="sub">Be honest 😌</p>
+        <div class="tiny">Tip: Try press the "No" button</div>
+      </div>
 
-    <div class="btnRow" id="btnRow">
-      <button class="yes" id="yesBtn">YES</button>
-      <button class="no" id="noBtn">NO</button>
+      <div class="page" id="quizPage">
+        <div class="quizHeader">
+          <span id="questionCounter">Question 1/10</span>
+          <span>Valentine Perfume Diagnostics</span>
+        </div>
+        <div class="progressTrack">
+          <div class="progressFill" id="progressFill"></div>
+        </div>
+
+        <h2 class="questionTitle" id="questionTitle"></h2>
+        <div class="optionsGrid" id="optionsGrid"></div>
+        <p class="tiny">Tap the option that feels most like your ideal date scene.</p>
+      </div>
+
+      <div class="page" id="resultPage">
+        <h2 class="resultTitle" id="resultTitle">Your Perfume Match</h2>
+        <p class="resultLead" id="resultLead"></p>
+        <div class="perfumeGrid" id="perfumeGrid"></div>
+        <div class="morePanel" id="morePerfumesPanel">
+          <h3 class="catalogTitle">More niche perfumes</h3>
+          <p class="catalogMeta">Complete list from all quiz profiles.</p>
+          <div class="catalogGrid" id="catalogGrid"></div>
+        </div>
+        <h3 class="shopTitle">Where to buy in Los Angeles</h3>
+        <div class="shopGrid" id="shopGrid"></div>
+        <h3 class="shareTitle">Send diagnosis</h3>
+        <div class="shareRow">
+          <a class="shareBtn" id="imessagePhoneBtn" href="#" target="_blank" rel="noopener noreferrer">iMessage to +41782111538</a>
+          <button class="shareBtn" id="copyReportBtn" type="button">Copy report</button>
+        </div>
+        <button class="againBtn" id="againBtn" type="button">Try again</button>
+        <button class="moreBtn" id="morePerfumesBtn" type="button">See more perfumes</button>
+      </div>
     </div>
   </div>
 
-  <!-- INSTRUCTION -->
-  <div class="page" id="instructionPage">
-    <div class="bigIcon">📬</div>
-    <h1>One more thing…</h1>
-    <p class="instruction">To check the mailbox in your apartment</p>
-    <p class="sub">Something special is waiting 💌</p>
-  </div>
-</div>
+  <script>
+    const themeToggle = document.getElementById("themeToggle");
+    const musicToggle = document.getElementById("musicToggle");
+    const bgMusic = document.getElementById("bgMusic");
+    const root = document.documentElement;
+    const savedTheme = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    let currentTheme = savedTheme || (prefersDark ? "dark" : "light");
 
-<!-- MODAL -->
-<div class="modalOverlay" id="modal">
-  <div class="modal">
-    <div class="modalTitle">🎉 Yay! 🎉</div>
-    <p class="modalSub">I knew it 💖 Thank you for choosing me</p>
-    <button class="yes" id="continueBtn">Continue</button>
-  </div>
-</div>
+    function applyTheme(theme){
+      currentTheme = theme;
+      root.setAttribute("data-theme", theme);
+      themeToggle.textContent = theme === "dark" ? "☀️ Light" : "🌙 Dark";
+      themeToggle.setAttribute(
+        "aria-label",
+        theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+      );
+    }
 
-<script>
-// hearts
-const hearts=document.getElementById("hearts");
-["💖","💘","💕","💓","❤️"].forEach(e=>{
-  for(let i=0;i<5;i++){
-    const h=document.createElement("div");
-    h.className="heart";
-    h.textContent=e;
-    h.style.left=Math.random()*100+"vw";
-    h.style.animationDuration=8+Math.random()*8+"s";
-    hearts.appendChild(h);
-  }
-});
+    applyTheme(currentTheme);
+    themeToggle.addEventListener("click", () => {
+      const next = currentTheme === "dark" ? "light" : "dark";
+      applyTheme(next);
+      localStorage.setItem("theme", next);
+    });
 
-// music unlock
-const music=document.getElementById("bgMusic");
-const mute=document.getElementById("muteBtn");
-async function playMusic(){ try{ await music.play(); }catch(e){} }
-window.addEventListener("pointerdown", playMusic, {once:true});
-mute.onclick=async()=>{
-  music.muted=!music.muted;
-  mute.textContent=music.muted?"🔇":"🔊";
-  if(!music.muted) await playMusic();
-};
+    let hasUserInteracted = false;
+    let isMusicOn = false;
 
-// NO button dodge
-const noBtn=document.getElementById("noBtn");
-const btnRow=document.getElementById("btnRow");
-let tries=0;
+    function updateMusicButton(){
+      musicToggle.textContent = isMusicOn ? "⏸ Music" : "▶ Music";
+      musicToggle.setAttribute(
+        "aria-label",
+        isMusicOn ? "Pause background music" : "Play background music"
+      );
+    }
 
-function dodge(){
-  tries++;
-  const rect=btnRow.getBoundingClientRect();
-  const x=(Math.random()*2-1)*Math.min(160, rect.width*0.4);
-  const y=(Math.random()*2-1)*80;
-  noBtn.style.transform=`translate(${x}px,${y}px)`;
-  if(tries>3){
-    document.getElementById("yesBtn").style.transform=`scale(${1+tries*0.05})`;
-  }
-}
-noBtn.addEventListener("mouseenter", dodge);
-noBtn.addEventListener("click", dodge);
-noBtn.addEventListener("touchstart",(e)=>{e.preventDefault();dodge();},{passive:false});
+    async function playMusic(){
+      try{
+        await bgMusic.play();
+        isMusicOn = true;
+      }catch{
+        isMusicOn = false;
+      }
+      updateMusicButton();
+    }
 
-// flow
-const modal=document.getElementById("modal");
-const askPage=document.getElementById("askPage");
-const instructionPage=document.getElementById("instructionPage");
+    function pauseMusic(){
+      bgMusic.pause();
+      isMusicOn = false;
+      updateMusicButton();
+    }
 
-document.getElementById("yesBtn").onclick=async()=>{
-  await playMusic();
-  modal.classList.add("show");
-};
-document.getElementById("continueBtn").onclick=()=>{
-  modal.classList.remove("show");
-  askPage.classList.remove("active");
-  instructionPage.classList.add("active");
-};
-</script>
+    function ensureMusicStarted(){
+      if (hasUserInteracted) return;
+      hasUserInteracted = true;
+      playMusic();
+    }
 
+    musicToggle.addEventListener("click", async () => {
+      hasUserInteracted = true;
+      if (isMusicOn) pauseMusic();
+      else await playMusic();
+    });
+
+    ["click", "touchstart", "keydown"].forEach((evt) => {
+      document.addEventListener(evt, ensureMusicStarted, { once:true });
+    });
+
+    updateMusicButton();
+    playMusic();
+
+    const params = new URLSearchParams(location.search);
+    const name = params.get("name");
+    if (name) document.getElementById("nameSlot").textContent = name;
+
+    const hearts = document.getElementById("hearts");
+    const emojis = ["💖","💘","💕","💗","💓","❤️"];
+    for (let i=0; i<26; i++){
+      const s = document.createElement("div");
+      s.className = "heart";
+      s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      s.style.left = Math.random()*100 + "vw";
+      s.style.animationDuration = (8 + Math.random()*10) + "s";
+      s.style.animationDelay = (-Math.random()*12) + "s";
+      s.style.fontSize = (14 + Math.random()*22) + "px";
+      hearts.appendChild(s);
+    }
+
+    const askPage = document.getElementById("askPage");
+    const quizPage = document.getElementById("quizPage");
+    const resultPage = document.getElementById("resultPage");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const questionCounter = document.getElementById("questionCounter");
+    const questionTitle = document.getElementById("questionTitle");
+    const optionsGrid = document.getElementById("optionsGrid");
+    const progressFill = document.getElementById("progressFill");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultLead = document.getElementById("resultLead");
+    const perfumeGrid = document.getElementById("perfumeGrid");
+    const morePerfumesBtn = document.getElementById("morePerfumesBtn");
+    const morePerfumesPanel = document.getElementById("morePerfumesPanel");
+    const catalogGrid = document.getElementById("catalogGrid");
+    const shopGrid = document.getElementById("shopGrid");
+    const imessagePhoneBtn = document.getElementById("imessagePhoneBtn");
+    const copyReportBtn = document.getElementById("copyReportBtn");
+    const mailboxToast = document.getElementById("mailboxToast");
+    let mailboxToastTimer = 0;
+
+    let tries = 0;
+    let questionIndex = 0;
+    let scores = [0, 0, 0, 0];
+
+    const questions = [
+      {
+        prompt:"On our Valentine's date, where should I take you first?",
+        options:[
+          {text:"Sunset walk by the river", profile:0, emoji:"🌇", scene:"sceneA"},
+          {text:"Cute cafe with warm pastries", profile:1, emoji:"☕", scene:"sceneB"},
+          {text:"Elegant restaurant dinner", profile:2, emoji:"🍽️", scene:"sceneC"},
+          {text:"Rooftop under city lights", profile:3, emoji:"🌃", scene:"sceneD"}
+        ]
+      },
+      {
+        prompt:"What flowers would make you smile the most?",
+        options:[
+          {text:"White tulips", profile:0, emoji:"🌷", scene:"sceneA"},
+          {text:"Pink peonies", profile:1, emoji:"🌸", scene:"sceneB"},
+          {text:"Classic red roses", profile:2, emoji:"🌹", scene:"sceneC"},
+          {text:"Dark burgundy roses", profile:3, emoji:"🥀", scene:"sceneD"}
+        ]
+      },
+      {
+        prompt:"Pick the drink for tonight.",
+        options:[
+          {text:"Sparkling water with lemon", profile:0, emoji:"🍋", scene:"sceneA"},
+          {text:"Sweet berry mocktail", profile:1, emoji:"🍓", scene:"sceneB"},
+          {text:"Vanilla latte", profile:2, emoji:"🫖", scene:"sceneC"},
+          {text:"A glass of red wine", profile:3, emoji:"🍷", scene:"sceneD"}
+        ]
+      },
+      {
+        prompt:"Which dessert are we sharing?",
+        options:[
+          {text:"Lemon tart", profile:0, emoji:"🍋", scene:"sceneA"},
+          {text:"Strawberry shortcake", profile:1, emoji:"🍰", scene:"sceneB"},
+          {text:"Creme brulee", profile:2, emoji:"🍮", scene:"sceneC"},
+          {text:"Dark chocolate fondant", profile:3, emoji:"🍫", scene:"sceneD"}
+        ]
+      },
+      {
+        prompt:"Pick your Valentine outfit vibe.",
+        options:[
+          {text:"Clean and minimal", profile:0, emoji:"🤍", scene:"sceneA"},
+          {text:"Soft and cute", profile:1, emoji:"🎀", scene:"sceneB"},
+          {text:"Classy and feminine", profile:2, emoji:"👗", scene:"sceneC"},
+          {text:"Bold and sexy", profile:3, emoji:"🖤", scene:"sceneD"}
+        ]
+      },
+      {
+        prompt:"What kind of compliment do you want from me?",
+        options:[
+          {text:"You feel so fresh and bright", profile:0, emoji:"✨", scene:"sceneA"},
+          {text:"You're sweet and adorable", profile:1, emoji:"💗", scene:"sceneB"},
+          {text:"You feel warm and comforting", profile:2, emoji:"🕯️", scene:"sceneC"},
+          {text:"You're irresistible tonight", profile:3, emoji:"🔥", scene:"sceneD"}
+        ]
+      },
+      {
+        prompt:"If we slow dance, what atmosphere do you want?",
+        options:[
+          {text:"Open air and cool breeze", profile:0, emoji:"🌬️", scene:"sceneA"},
+          {text:"Fairy lights and flowers", profile:1, emoji:"🧚", scene:"sceneB"},
+          {text:"Candlelight and soft piano", profile:2, emoji:"🕯️", scene:"sceneC"},
+          {text:"Dark lounge and deep beats", profile:3, emoji:"🎶", scene:"sceneD"}
+        ]
+      },
+      {
+        prompt:"How noticeable should your perfume be to me?",
+        options:[
+          {text:"Very subtle and skin-close", profile:0, emoji:"🌫️", scene:"sceneA"},
+          {text:"Soft but clearly romantic", profile:1, emoji:"💞", scene:"sceneB"},
+          {text:"Noticeable and cozy all night", profile:2, emoji:"🧣", scene:"sceneC"},
+          {text:"Bold and unforgettable", profile:3, emoji:"💥", scene:"sceneD"}
+        ]
+      },
+      {
+        prompt:"At the end of the date, your scent should feel...",
+        options:[
+          {text:"Clean, airy, and natural", profile:0, emoji:"🍃", scene:"sceneA"},
+          {text:"Sweet, romantic, and playful", profile:1, emoji:"💐", scene:"sceneB"},
+          {text:"Creamy, warm, and comforting", profile:2, emoji:"🍨", scene:"sceneC"},
+          {text:"Mysterious, smoky, and deep", profile:3, emoji:"🌙", scene:"sceneD"}
+        ]
+      },
+      {
+        prompt:"Our final Valentine moment is...",
+        options:[
+          {text:"Quiet hand-in-hand night walk", profile:0, emoji:"🤝", scene:"sceneA"},
+          {text:"A cute photo booth memory", profile:1, emoji:"📸", scene:"sceneB"},
+          {text:"A long warm hug under lights", profile:2, emoji:"💞", scene:"sceneC"},
+          {text:"A dramatic movie-like kiss", profile:3, emoji:"💋", scene:"sceneD"}
+        ]
+      }
+    ];
+
+    const profiles = [
+      {
+        name:"Fresh Daylight",
+        blurb:"You match sparkling, clean, airy scents with low sweetness and effortless charm.",
+        picks:[
+          {name:"Xerjoff XJ 1861 Naxos", note:"Honey-tobacco citrus glow with bright lift and polished freshness."},
+          {name:"Le Labo Bergamote 22", note:"Bright bergamot-musky signature with polished niche freshness."},
+          {name:"Maison Margiela Beach Walk", note:"Sunny bergamot-coconut beach mood with light breezy warmth."},
+          {name:"Memo Paris Lalibela", note:"Soft floral-incense warmth with an elegant, dreamy niche signature."},
+          {name:"Acqua di Parma Fico di Amalfi", note:"Citrus-fig sparkle with bright Mediterranean freshness."}
+        ]
+      },
+      {
+        name:"Sweet Romantic",
+        blurb:"You shine in fruity-floral perfumes with soft sweetness and a playful romantic mood.",
+        picks:[
+          {name:"Parfums de Marly Delina", note:"Modern rose-lychee floral with elegant sweetness and lift."},
+          {name:"Maison Crivelli Hibiscus Mahajad", note:"Radiant floral-fruity extrait with romantic signature projection."},
+          {name:"Initio Atomic Rose", note:"Lush rose with a sensual edge and date-night magnetism."},
+          {name:"Le Labo Rose 31", note:"Spiced rose-wood composition with romantic depth and modern balance."},
+          {name:"Memo Paris Marfa", note:"Creamy white-floral signature with dreamy, seductive sweetness."}
+        ]
+      },
+      {
+        name:"Warm Elegant",
+        blurb:"You fit creamy vanilla, amber, and musky scents that feel cozy, classy, and lasting.",
+        picks:[
+          {name:"Frederic Malle Musc Ravageur", note:"Amber-vanilla musk warmth with smooth, luxurious comfort."},
+          {name:"Ormonde Jayne Champaca", note:"Elegant floral profile with rich textured softness and sophistication."},
+          {name:"Serge Lutens La Fille de Berlin", note:"Rich rose depth with refined warmth and artistic character."},
+          {name:"Acqua di Parma Ambra", note:"Refined amber depth with polished Italian elegance."},
+          {name:"Atelier Cologne Santal Carmin", note:"Smooth sandalwood-vanilla depth with elegant niche character."}
+        ]
+      },
+      {
+        name:"Bold Seductive",
+        blurb:"You own deep, intense notes: coffee, woods, spice, and sensual evening drama.",
+        picks:[
+          {name:"Frederic Malle Portrait of a Lady", note:"Rose, patchouli, and incense with bold signature presence."},
+          {name:"Maison Crivelli Oud Maracuja", note:"Awarded oud-fruit contrast with powerful niche character."},
+          {name:"Initio Side Effect", note:"Rum, tobacco, vanilla, and spice for an addictive night aura."},
+          {name:"Parfums de Marly Carlisle", note:"Dark fruit, spice, and woods for rich evening projection."},
+          {name:"Serge Lutens Chergui", note:"Honeyed tobacco-amber depth with smoky sensual warmth."}
+        ]
+      }
+    ];
+    const datePlans = {
+      "Fresh Daylight":[
+        "Start with a sunset walk and keep the mood bright and low-pressure.",
+        "Bring white tulips, then stop at a clean cafe for citrus dessert.",
+        "Pick a fresh scent and finish with a quiet hand-in-hand night walk."
+      ],
+      "Sweet Romantic":[
+        "Set up a cute date flow: flowers, photo spot, then cozy dessert.",
+        "Choose a soft pink or floral place with warm lights for her vibe.",
+        "Pick a romantic floral perfume and keep close moments playful."
+      ],
+      "Warm Elegant":[
+        "Book an elegant dinner with candlelight and slower pacing.",
+        "Choose vanilla/amber style perfume for a comforting signature trail.",
+        "End with a long warm hug and a short scenic drive or walk."
+      ],
+      "Bold Seductive":[
+        "Start later in the evening with dressy styling and city-night energy.",
+        "Choose a dramatic venue: rooftop, jazz lounge, or intimate bar.",
+        "Pick a strong niche scent and plan one memorable final moment."
+      ]
+    };
+
+    const laShops = [
+      {
+        name:"Scent Bar Hollywood",
+        address:"7405 Beverly Blvd, Los Angeles, CA 90036",
+        phone:"+1 323-782-8300",
+        map:"https://maps.google.com/?q=7405+Beverly+Blvd+Los+Angeles+CA+90036",
+        site:"https://www.luckyscent.com/scentbar/hollywood",
+        brands:["Xerjoff","Juliette Has a Gun","Memo Paris","Maison Crivelli","Initio","Ormonde Jayne","Essential Parfums","Frederic Malle","Parfums de Marly","Acqua di Parma","Atelier Cologne"]
+      },
+      {
+        name:"Scent Bar DTLA",
+        address:"777 S. Alameda St, Los Angeles, CA 90021",
+        phone:"+1 213-395-0023",
+        map:"https://maps.google.com/?q=777+S+Alameda+St+Los+Angeles+CA+90021",
+        site:"https://www.luckyscent.com/scentbar/dtla",
+        brands:["Xerjoff","Juliette Has a Gun","Memo Paris","Maison Crivelli","Initio","Ormonde Jayne","Essential Parfums","Frederic Malle","Parfums de Marly","Acqua di Parma","Atelier Cologne"]
+      },
+      {
+        name:"Frédéric Malle Melrose Place",
+        address:"8417 Melrose Place, West Hollywood, CA 90069",
+        phone:"+1 323-879-9727",
+        map:"https://maps.google.com/?q=8417+Melrose+Place+West+Hollywood+CA+90069",
+        site:"https://www.fredericmalle.com/about/stores",
+        brands:["Frederic Malle"]
+      },
+      {
+        name:"Parfums de Marly Beverly Hills Boutique",
+        address:"9540 Brighton Way, Beverly Hills, CA",
+        phone:"Check boutique page",
+        map:"https://maps.google.com/?q=9540+Brighton+Way+Beverly+Hills+CA",
+        site:"https://parfums-de-marly.com/pages/store-locator",
+        brands:["Parfums de Marly"]
+      },
+      {
+        name:"Maison Margiela Melrose Place",
+        address:"8451 Melrose Place, Los Angeles, CA 90069",
+        phone:"+1 747-219-2525",
+        map:"https://maps.google.com/?q=8451+Melrose+Place+Los+Angeles+CA+90069",
+        site:"https://www.maisonmargiela.com/en-us/stores/maison-margiela-melrose-place",
+        brands:["Maison Margiela"]
+      }
+    ];
+
+    function setPage(target){
+      [askPage, quizPage, resultPage].forEach((p) => p.classList.remove("active"));
+      target.classList.add("active");
+    }
+
+    function renderQuestion(){
+      const q = questions[questionIndex];
+      questionCounter.textContent = `Question ${questionIndex + 1}/${questions.length}`;
+      questionTitle.textContent = q.prompt;
+      progressFill.style.width = `${(questionIndex / questions.length) * 100}%`;
+
+      optionsGrid.innerHTML = "";
+
+      q.options.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "optionCard";
+        btn.innerHTML = `
+          <div class="optionVisual ${opt.scene}"><span>${opt.emoji}</span></div>
+          <span class="optionText">${opt.text}</span>
+        `;
+        btn.addEventListener("click", () => chooseOption(opt.profile));
+        optionsGrid.appendChild(btn);
+      });
+    }
+
+    function chooseOption(profileIndex){
+      scores[profileIndex] += 1;
+      questionIndex += 1;
+
+      if (questionIndex >= questions.length){
+        showResult();
+        return;
+      }
+
+      renderQuestion();
+    }
+
+    function showResult(){
+      progressFill.style.width = "100%";
+
+      let bestIdx = 0;
+      let secondIdx = 1;
+      for (let i=0; i<scores.length; i++){
+        if (scores[i] > scores[bestIdx]) bestIdx = i;
+      }
+      for (let j=0; j<scores.length; j++){
+        if (j === bestIdx) continue;
+        if (scores[j] > scores[secondIdx] || secondIdx === bestIdx) secondIdx = j;
+      }
+
+      const best = profiles[bestIdx];
+      const backup = profiles[secondIdx];
+
+      resultTitle.textContent = `Your match: ${best.name} ✨`;
+      resultLead.textContent = `${best.blurb} Bonus blend: ${backup.name}.`;
+
+      perfumeGrid.innerHTML = "";
+      best.picks.forEach((p) => {
+        const fragranticaUrl = `https://www.fragrantica.com/search/?query=${encodeURIComponent(p.name)}`;
+        const officialUrl = getOfficialSite(p.name);
+        const box = document.createElement("article");
+        box.className = "perfumeCard";
+        box.innerHTML = `
+          <h3 class="perfumeName">${p.name}</h3>
+          <p class="perfumeNote">${p.note}</p>
+          <div class="perfumeLinks">
+            <a class="perfumeLink" href="${officialUrl}" target="_blank" rel="noopener noreferrer">Official site</a>
+            <a class="perfumeLink" href="${fragranticaUrl}" target="_blank" rel="noopener noreferrer">Product details</a>
+          </div>
+        `;
+        perfumeGrid.appendChild(box);
+      });
+
+      const backupFragrantica = `https://www.fragrantica.com/search/?query=${encodeURIComponent(backup.picks[0].name)}`;
+      const backupOfficial = getOfficialSite(backup.picks[0].name);
+      const bonus = document.createElement("article");
+      bonus.className = "perfumeCard";
+      bonus.innerHTML = `
+        <h3 class="perfumeName">Bonus pick: ${backup.picks[0].name}</h3>
+        <p class="perfumeNote">From your second profile (${backup.name}): ${backup.picks[0].note}</p>
+        <div class="perfumeLinks">
+          <a class="perfumeLink" href="${backupOfficial}" target="_blank" rel="noopener noreferrer">Official site</a>
+          <a class="perfumeLink" href="${backupFragrantica}" target="_blank" rel="noopener noreferrer">Product details</a>
+        </div>
+      `;
+      perfumeGrid.appendChild(bonus);
+
+      renderShopLocations(best, backup);
+      buildShareActions(best, backup);
+
+      setPage(resultPage);
+      if (!isMusicOn) playMusic();
+    }
+
+    function startQuiz(){
+      questionIndex = 0;
+      scores = [0, 0, 0, 0];
+      morePerfumesPanel.classList.remove("active");
+      morePerfumesBtn.textContent = "See more perfumes";
+      catalogGrid.innerHTML = "";
+      setPage(quizPage);
+      renderQuestion();
+      if (!isMusicOn) playMusic();
+    }
+
+    function showAsk(){
+      setPage(askPage);
+      noBtn.style.transform = "translate(0,0)";
+      yesBtn.style.transform = "scale(1)";
+      tries = 0;
+    }
+
+    yesBtn.addEventListener("click", startQuiz);
+    document.getElementById("againBtn").addEventListener("click", showAsk);
+    copyReportBtn.addEventListener("click", copyReportText);
+    morePerfumesBtn.addEventListener("click", toggleMorePerfumes);
+    [imessagePhoneBtn].forEach((el) => {
+      el.addEventListener("click", handleShareLinkClick);
+    });
+
+    function showMailboxToast(durationMs = 4600){
+      mailboxToast.classList.add("show");
+      clearTimeout(mailboxToastTimer);
+      mailboxToastTimer = setTimeout(() => {
+        mailboxToast.classList.remove("show");
+      }, durationMs);
+    }
+
+    function handleShareLinkClick(e){
+      e.preventDefault();
+      const link = e.currentTarget;
+      const href = link.getAttribute("href");
+      if (!href || href === "#") return;
+
+      showMailboxToast(4600);
+
+      setTimeout(() => {
+        window.location.href = href;
+      }, 700);
+    }
+
+    function getOfficialSite(name){
+      if (name.includes("Acqua di Parma")) return "https://www.acquadiparma.com/";
+      if (name.includes("Parfums de Marly")) return "https://us.parfums-de-marly.com/";
+      if (name.includes("Frederic Malle")) return "https://www.fredericmalle.com/";
+      if (name.includes("Le Labo")) return "https://www.lelabofragrances.com/";
+      if (name.includes("Serge Lutens")) return "https://sergelutens.com/";
+      if (name.includes("Atelier Cologne")) return "https://ateliercologne.com/";
+      if (name.includes("Maison Crivelli")) return "https://maisoncrivelli.com/";
+      if (name.includes("Ormonde Jayne")) return "https://ormondejayne.com/";
+      if (name.includes("Xerjoff")) return "https://xerjoff.com/";
+      if (name.includes("Initio")) return "https://initioparfums.com/";
+      if (name.includes("Juliette Has a Gun")) return "https://www.juliettehasagun.com/";
+      if (name.includes("Maison Margiela")) return "https://www.maisonmargiela-fragrances.us/";
+      if (name.includes("Memo Paris")) return "https://www.memoparis.com/";
+      if (name.includes("Essential Parfums")) return "https://www.essentialparfums.com/";
+      return "https://ads-perfumes.com/15-best-niche-perfume-brands-for-2025/";
+    }
+
+    function getBrandFromName(name){
+      if (name.includes("Acqua di Parma")) return "Acqua di Parma";
+      if (name.includes("Parfums de Marly")) return "Parfums de Marly";
+      if (name.includes("Frederic Malle")) return "Frederic Malle";
+      if (name.includes("Le Labo")) return "Le Labo";
+      if (name.includes("Serge Lutens")) return "Serge Lutens";
+      if (name.includes("Atelier Cologne")) return "Atelier Cologne";
+      if (name.includes("Maison Crivelli")) return "Maison Crivelli";
+      if (name.includes("Ormonde Jayne")) return "Ormonde Jayne";
+      if (name.includes("Xerjoff")) return "Xerjoff";
+      if (name.includes("Initio")) return "Initio";
+      if (name.includes("Maison Margiela")) return "Maison Margiela";
+      if (name.includes("Memo Paris")) return "Memo Paris";
+      return "Niche";
+    }
+
+    function renderMorePerfumes(){
+      catalogGrid.innerHTML = "";
+      profiles.forEach((profile) => {
+        const group = document.createElement("section");
+        group.className = "catalogGroup";
+        group.innerHTML = `<h4 class="catalogGroupTitle">${profile.name}</h4>`;
+
+        const grid = document.createElement("div");
+        grid.className = "perfumeGrid";
+
+        profile.picks.forEach((pick) => {
+          const officialUrl = getOfficialSite(pick.name);
+          const fragranticaUrl = `https://www.fragrantica.com/search/?query=${encodeURIComponent(pick.name)}`;
+          const box = document.createElement("article");
+          box.className = "perfumeCard";
+          box.innerHTML = `
+            <h3 class="perfumeName">${pick.name}</h3>
+            <p class="perfumeNote">${pick.note}</p>
+            <div class="perfumeLinks">
+              <a class="perfumeLink" href="${officialUrl}" target="_blank" rel="noopener noreferrer">Official site</a>
+              <a class="perfumeLink" href="${fragranticaUrl}" target="_blank" rel="noopener noreferrer">Product details</a>
+            </div>
+          `;
+          grid.appendChild(box);
+        });
+
+        group.appendChild(grid);
+        catalogGrid.appendChild(group);
+      });
+    }
+
+    function toggleMorePerfumes(){
+      const open = morePerfumesPanel.classList.toggle("active");
+      morePerfumesBtn.textContent = open ? "Hide more perfumes" : "See more perfumes";
+      if (open && !catalogGrid.childElementCount) renderMorePerfumes();
+    }
+
+    function getRecommendedShops(best, backup){
+      const brands = new Set();
+      best.picks.forEach((p) => brands.add(getBrandFromName(p.name)));
+      brands.add(getBrandFromName(backup.picks[0].name));
+
+      const recommended = laShops.filter((shop) => shop.brands.some((b) => brands.has(b)));
+      return recommended.length ? recommended : laShops;
+    }
+
+    function buildReportText(best, backup){
+      const topLines = best.picks.map((p, idx) => `${idx + 1}. ${p.name} - ${p.note}`);
+      const stores = getRecommendedShops(best, backup).map((s) => `- ${s.name}: ${s.address}`);
+      const planItems = [...(datePlans[best.name] || []), "Before the date, check your mailbox for a surprise letter from Zurich."];
+      const plan = planItems.map((item, idx) => `${idx + 1}. ${item}`);
+
+      return [
+        "Valentine Perfume Diagnosis",
+        `Profile: ${best.name}`,
+        `Vibe summary: ${best.blurb}`,
+        "",
+        "Top perfume picks:",
+        ...topLines,
+        "",
+        `Bonus pick: ${backup.picks[0].name}`,
+        `Bonus note: ${backup.picks[0].note}`,
+        "",
+        "What to do with her tonight:",
+        ...plan,
+        "",
+        "LA shop locations:",
+        ...stores
+      ].join("\n");
+    }
+
+    function renderShopLocations(best, backup){
+      const finalShops = getRecommendedShops(best, backup);
+
+      shopGrid.innerHTML = "";
+      finalShops.forEach((shop) => {
+        const card = document.createElement("article");
+        card.className = "shopCard";
+        card.innerHTML = `
+          <h4 class="shopName">${shop.name}</h4>
+          <p class="shopMeta">${shop.address}</p>
+          <p class="shopMeta">${shop.phone}</p>
+          <div class="shopLinks">
+            <a class="perfumeLink" href="${shop.map}" target="_blank" rel="noopener noreferrer">Open map</a>
+            <a class="perfumeLink" href="${shop.site}" target="_blank" rel="noopener noreferrer">Store page</a>
+          </div>
+        `;
+        shopGrid.appendChild(card);
+      });
+    }
+
+    function buildShareActions(best, backup){
+      const report = buildReportText(best, backup);
+      const encoded = encodeURIComponent(report);
+      imessagePhoneBtn.href = `sms:+41782111538?&body=${encoded}`;
+      copyReportBtn.dataset.report = report;
+    }
+
+    async function copyReportText(){
+      showMailboxToast(3200);
+      const text = copyReportBtn.dataset.report || "Valentine Perfume Diagnosis";
+      try{
+        await navigator.clipboard.writeText(text);
+        copyReportBtn.textContent = "Copied";
+        setTimeout(() => { copyReportBtn.textContent = "Copy report"; }, 1200);
+      }catch{
+        copyReportBtn.textContent = "Copy failed";
+        setTimeout(() => { copyReportBtn.textContent = "Copy report"; }, 1400);
+      }
+    }
+
+    function dodge(){
+      tries += 1;
+      const row = document.getElementById("btnRow");
+      const rect = row.getBoundingClientRect();
+      const maxX = Math.min(160, rect.width * 0.35);
+      const maxY = 90;
+      const x = (Math.random()*2 - 1) * maxX;
+      const y = (Math.random()*2 - 1) * maxY;
+      noBtn.style.transform = `translate(${x}px, ${y}px)`;
+
+      if (tries >= 3){
+        const scale = Math.min(1.25, 1 + tries * 0.05);
+        yesBtn.style.transform = `scale(${scale})`;
+      }
+    }
+
+    noBtn.addEventListener("mouseenter", dodge);
+    noBtn.addEventListener("click", dodge);
+    noBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      dodge();
+    }, {passive:false});
+  </script>
 </body>
 </html>
