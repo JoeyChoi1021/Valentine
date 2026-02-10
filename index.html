@@ -436,6 +436,55 @@
       min-width:0;
     }
     .shareBtn:hover{ filter:brightness(1.03); }
+    .mailboxModal{
+      position:fixed;
+      inset:0;
+      display:none;
+      place-items:center;
+      background:rgba(0,0,0,.22);
+      backdrop-filter:blur(5px);
+      z-index:1300;
+    }
+    .mailboxModal.show{ display:grid; }
+    .mailboxModalCard{
+      width:min(360px, 88vw);
+      background:rgba(255,255,255,.96);
+      border:2px solid rgba(255,201,71,.9);
+      border-radius:16px;
+      padding:16px 14px;
+      text-align:center;
+      box-shadow:0 16px 34px rgba(0,0,0,.25);
+    }
+    .mailboxModalTitle{
+      margin:0 0 8px;
+      font-size:18px;
+      line-height:1.3;
+      font-weight:800;
+      color:#281600;
+    }
+    .mailboxModalRow{
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      margin-top:10px;
+      flex-wrap:wrap;
+    }
+    .modalBtn{
+      border:1px solid var(--card-border);
+      border-radius:999px;
+      padding:8px 14px;
+      font-size:12px;
+      font-weight:760;
+      background:var(--choice-bg);
+      color:var(--text);
+      cursor:pointer;
+      box-shadow:none;
+    }
+    .modalBtn.primary{
+      color:#2a1d00;
+      border-color:rgba(200,150,20,.45);
+      background: linear-gradient(135deg, #ffd54a, #ffbf2f);
+    }
     .mailboxToast{
       position:fixed;
       top:18px;
@@ -474,6 +523,15 @@
   </style>
 </head>
 <body>
+  <div class="mailboxModal" id="mailboxModal">
+    <div class="mailboxModalCard">
+      <p class="mailboxModalTitle">📬 Before sending the report to Joey,<br>Please check your mailbox in the lobby.</p>
+      <div class="mailboxModalRow">
+        <button class="modalBtn" id="mailboxCancelBtn" type="button">Cancel</button>
+        <button class="modalBtn primary" id="mailboxSendBtn" type="button">Send</button>
+      </div>
+    </div>
+  </div>
   <div class="mailboxToast" id="mailboxToast">📬 Go check your mailbox in the Lobby! 💌</div>
   <div class="hearts" id="hearts"></div>
 
@@ -481,9 +539,7 @@
     <div class="card">
       <button class="musicToggle" id="musicToggle" type="button" aria-label="Play background music">▶ Music</button>
       <button class="themeToggle" id="themeToggle" type="button" aria-label="Toggle dark mode">🌙 Dark</button>
-      <audio id="bgMusic" autoplay loop preload="metadata">
-        <source src="song.mp3" type="audio/mpeg" />
-      </audio>
+      <audio id="bgMusic" preload="metadata"></audio>
 
       <div class="page active" id="askPage">
         <h1><span id="nameSlot">Renee</span>,<br/>will you be my Valentine? 💘</h1>
@@ -561,6 +617,27 @@
 
     let hasUserInteracted = false;
     let isMusicOn = false;
+    const playlist = [
+      "song1.mp3",
+      "song2.mp3",
+      "song3.mp3",
+      "song4.mp3",
+      "song5.mp3"
+    ];
+    let playlistIndex = 0;
+    let playlistReady = false;
+
+    function setTrack(index){
+      playlistIndex = ((index % playlist.length) + playlist.length) % playlist.length;
+      bgMusic.src = playlist[playlistIndex];
+      bgMusic.load();
+    }
+
+    function ensurePlaylist(){
+      if (playlistReady || !playlist.length) return;
+      setTrack(0);
+      playlistReady = true;
+    }
 
     function updateMusicButton(){
       musicToggle.textContent = isMusicOn ? "⏸ Music" : "▶ Music";
@@ -571,6 +648,7 @@
     }
 
     async function playMusic(){
+      ensurePlaylist();
       try{
         await bgMusic.play();
         isMusicOn = true;
@@ -584,6 +662,14 @@
       bgMusic.pause();
       isMusicOn = false;
       updateMusicButton();
+    }
+
+    async function playNextTrack(){
+      if (!playlist.length) return;
+      setTrack(playlistIndex + 1);
+      if (isMusicOn || hasUserInteracted){
+        await playMusic();
+      }
     }
 
     function ensureMusicStarted(){
@@ -601,6 +687,8 @@
     ["click", "touchstart", "keydown"].forEach((evt) => {
       document.addEventListener(evt, ensureMusicStarted, { once:true });
     });
+    bgMusic.addEventListener("ended", playNextTrack);
+    bgMusic.addEventListener("error", playNextTrack);
 
     updateMusicButton();
     playMusic();
@@ -640,8 +728,12 @@
     const shopGrid = document.getElementById("shopGrid");
     const imessagePhoneBtn = document.getElementById("imessagePhoneBtn");
     const copyReportBtn = document.getElementById("copyReportBtn");
+    const mailboxModal = document.getElementById("mailboxModal");
+    const mailboxCancelBtn = document.getElementById("mailboxCancelBtn");
+    const mailboxSendBtn = document.getElementById("mailboxSendBtn");
     const mailboxToast = document.getElementById("mailboxToast");
     let mailboxToastTimer = 0;
+    let pendingImessageHref = "";
 
     let tries = 0;
     let questionIndex = 0;
@@ -969,8 +1061,11 @@
     document.getElementById("againBtn").addEventListener("click", showAsk);
     copyReportBtn.addEventListener("click", copyReportText);
     morePerfumesBtn.addEventListener("click", toggleMorePerfumes);
-    [imessagePhoneBtn].forEach((el) => {
-      el.addEventListener("click", handleShareLinkClick);
+    imessagePhoneBtn.addEventListener("click", handleImessageClick);
+    mailboxCancelBtn.addEventListener("click", closeMailboxModal);
+    mailboxSendBtn.addEventListener("click", confirmMailboxAndSend);
+    mailboxModal.addEventListener("click", (e) => {
+      if (e.target === mailboxModal) closeMailboxModal();
     });
 
     function showMailboxToast(durationMs = 4600){
@@ -981,17 +1076,25 @@
       }, durationMs);
     }
 
-    function handleShareLinkClick(e){
+    function handleImessageClick(e){
       e.preventDefault();
       const link = e.currentTarget;
       const href = link.getAttribute("href");
       if (!href || href === "#") return;
+      pendingImessageHref = href;
+      mailboxModal.classList.add("show");
+    }
 
-      showMailboxToast(4600);
+    function closeMailboxModal(){
+      mailboxModal.classList.remove("show");
+      pendingImessageHref = "";
+    }
 
-      setTimeout(() => {
-        window.location.href = href;
-      }, 700);
+    function confirmMailboxAndSend(){
+      const href = pendingImessageHref;
+      closeMailboxModal();
+      if (!href) return;
+      window.location.href = href;
     }
 
     function getOfficialSite(name){
